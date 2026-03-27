@@ -1,8 +1,20 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/AL-Go-Actions/v8.3/.Modules/settings.schema.json",
-  "country": "us",
-  "appFolders": [],
+  "country": "dk",
+  "appFolders": [
+    "app1"
+  ],
   "testFolders": [],
   "bcptTestFolders": [],
-  "repoVersion": "1.1"
+  "unusedALGoSystemFiles": [
+    "CreateOnlineDevelopmentEnvironment.yaml",
+    "DeployReferenceDocumentation.yaml",
+    "Current.yaml",
+    "NextMajor.yaml",
+    "NextMinor.yaml",
+    "AddExistingAppOrTestApp.yaml",
+    "CreateApp.yaml",
+    "CreatePerformanceTestApp.yaml",
+    "CreateTestApp.yaml"
+  ]
 }
