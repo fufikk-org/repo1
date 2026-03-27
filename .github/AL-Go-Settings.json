@@ -3,6 +3,7 @@
   "type": "PTE",
   "templateUrl": "https://github.com/microsoft/AL-Go-PTE@main",
   "country": "dk",
-  "repoversion": "27.0",
-  "versionStrategy": 16
+  "repoVersion": "27.0",
+  "versioningStrategy": 16,
+  "appFolders": ["app1"]
 }
