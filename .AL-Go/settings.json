@@ -6,7 +6,7 @@
   ],
   "testFolders": [],
   "bcptTestFolders": [],
-    "unusedALGoSystemFiles": [
+  "unusedALGoSystemFiles": [
     "CreateOnlineDevelopmentEnvironment.yaml",
     "DeployReferenceDocumentation.yaml",
     "Current.yaml",
