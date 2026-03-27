@@ -5,5 +5,8 @@
   "country": "dk",
   "repoVersion": "27.0",
   "versioningStrategy": 16,
-  "appFolders": ["app1"]
+  "appFolders": [
+    "app1"
+  ],
+  "templateSha": "63fc1e7b31ee4a59816fd92aff26bdd3924de4ec"
 }
