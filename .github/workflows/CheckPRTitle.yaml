@@ -42,17 +42,17 @@ jobs:
               c => c.user.type === 'Bot' && c.body.includes('<!-- ab-check -->')
             );
             const body = [
-              '## ⚠️ Brak powiązania z Azure DevOps',
+              '## ⚠️ Missing Azure DevOps Work Item Link',
               '',
-              'Tytuł tego PR nie zawiera odnośnika do work itemu w Azure DevOps.',
+              'The PR title does not contain a reference to an Azure DevOps work item.',
               '',
-              '**Aby to naprawić**, zaktualizuj tytuł PR dodając `AB#<numer>`, np.:',
+              '**To fix this**, update the PR title to include `AB#<number>`, e.g.:',
               '',
               '> `feat: add customer list page AB#1234`',
               '',
               '> `fix: correct VAT calculation AB#42`',
               '',
-              'Powiązanie z work itemem zapewnia pełną traceability między kodem a wymaganiami.',
+              'Linking to a work item ensures full traceability between code changes and requirements.',
               '',
               '<!-- ab-check -->'
             ].join('\n');
@@ -90,6 +90,6 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 comment_id: existing.id,
-                body: '✅ **Powiązanie z Azure DevOps dodane** — w tytule PR znaleziono `${{ steps.check.outputs.match }}`. Możesz oznaczyć tę rozmowę jako rozwiązaną.\n\n<!-- ab-check -->'
+                body: '✅ **Azure DevOps work item linked** — found `${{ steps.check.outputs.match }}` in the PR title. You can now mark this conversation as resolved.\n\n<!-- ab-check -->'
               });
             }
