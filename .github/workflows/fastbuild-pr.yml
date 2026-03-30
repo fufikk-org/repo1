@@ -147,6 +147,15 @@ jobs:
           path: workspace/.alpackages
           key: ${{ steps.cache-key.outputs.cache-key }}
 
+      # ── Normalize path separators in AL source (non-Windows only) ──
+      # AL source authored on Windows may contain backslashes in path
+      # properties (e.g. LayoutFile). Replace with forward slashes so
+      # alc.dll does not emit AL0363 on Linux runners.
+      - name: Normalize AL path separators
+        if: runner.os != 'Windows'
+        shell: bash
+        run: find workspace -name "*.al" -exec sed -E -i '/(LayoutFile|RDLCLayout|WordLayout|ExcelLayout)\s*=/s|\\|/|g' {} +
+
       # ── Build (compile only — symbols already in .alpackages) ───
       # Get-ALSymbols inside Build-BCWorkspace skips download because
       # .alpackages already contains files from the cache/download steps.
