@@ -1,5 +1,5 @@
 {
     "country": "DK",
-    "apps": ["app1"],
+    "apps": ["app1", "app1.Test],
     "outputPath": ".output"
 }
