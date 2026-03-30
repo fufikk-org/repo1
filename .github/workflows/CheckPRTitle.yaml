@@ -5,19 +5,91 @@ on:
     branches: [ 'develop' ]
     types: [ opened, edited, synchronize, reopened ]
 
+permissions:
+  pull-requests: write
+
 jobs:
   CheckABLink:
     name: Check Azure DevOps AB# link in PR title
     runs-on: ubuntu-latest
     steps:
       - name: Validate AB# reference in PR title
+        id: check
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
           if [[ "$PR_TITLE" =~ AB#[0-9]+ ]]; then
             MATCH=$(echo "$PR_TITLE" | grep -oP 'AB#[0-9]+')
             echo "✅ Found Azure DevOps work item reference: $MATCH"
+            echo "found=true" >> $GITHUB_OUTPUT
+            echo "match=$MATCH" >> $GITHUB_OUTPUT
           else
-            echo "::warning::PR title does not contain an Azure DevOps work item reference (e.g. AB#1234). Please update the title."
-            echo "Current title: $PR_TITLE"
+            echo "::warning::PR title does not contain an Azure DevOps work item reference (e.g. AB#1234)."
+            echo "found=false" >> $GITHUB_OUTPUT
           fi
+
+      - name: Post or update warning comment if AB# missing
+        if: steps.check.outputs.found == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number
+            });
+            const existing = comments.data.find(
+              c => c.user.type === 'Bot' && c.body.includes('<!-- ab-check -->')
+            );
+            const body = [
+              '## ⚠️ Brak powiązania z Azure DevOps',
+              '',
+              'Tytuł tego PR nie zawiera odnośnika do work itemu w Azure DevOps.',
+              '',
+              '**Aby to naprawić**, zaktualizuj tytuł PR dodając `AB#<numer>`, np.:',
+              '',
+              '> `feat: add customer list page AB#1234`',
+              '',
+              '> `fix: correct VAT calculation AB#42`',
+              '',
+              'Powiązanie z work itemem zapewnia pełną traceability między kodem a wymaganiami.',
+              '',
+              '<!-- ab-check -->'
+            ].join('\n');
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body
+              });
+            }
+
+      - name: Update comment to resolved if AB# present
+        if: steps.check.outputs.found == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number
+            });
+            const existing = comments.data.find(
+              c => c.user.type === 'Bot' && c.body.includes('<!-- ab-check -->')
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body: '✅ **Powiązanie z Azure DevOps dodane** — w tytule PR znaleziono `${{ steps.check.outputs.match }}`. Możesz oznaczyć tę rozmowę jako rozwiązaną.\n\n<!-- ab-check -->'
+              });
+            }
