@@ -1,4 +1,4 @@
-name: 'Check PR Title AB# Link'
+name: 'COL - Check PR Title AB# Link'
 
 on:
   pull_request:
