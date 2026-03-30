@@ -1,0 +1,23 @@
+name: 'Check PR Title AB# Link'
+
+on:
+  pull_request:
+    branches: [ 'develop' ]
+    types: [ opened, edited, synchronize, reopened ]
+
+jobs:
+  CheckABLink:
+    name: Check Azure DevOps AB# link in PR title
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate AB# reference in PR title
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          if [[ "$PR_TITLE" =~ AB#[0-9]+ ]]; then
+            MATCH=$(echo "$PR_TITLE" | grep -oP 'AB#[0-9]+')
+            echo "✅ Found Azure DevOps work item reference: $MATCH"
+          else
+            echo "::warning::PR title does not contain an Azure DevOps work item reference (e.g. AB#1234). Please update the title."
+            echo "Current title: $PR_TITLE"
+          fi
