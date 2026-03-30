@@ -9,6 +9,6 @@ pageextension 56010 CustomerListExt extends "Customer List"
         AppPublishedMsg: Label 'App published: Hello world again 7';
     begin
         Message(AppPublishedMsg);
-        Error(asdfasfas);
+        // Error(asdfasfas);
     end;
 }
