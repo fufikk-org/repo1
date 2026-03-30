@@ -114,7 +114,6 @@ page 70200 "COL Vendors Custom"
                 field(eMail; Rec."E-Mail") { }
 
                 field(homePage; Rec."Home Page") { }
-#pragma warning restore AL0432
 
                 field(noSeries; Rec."No. Series") { }
 

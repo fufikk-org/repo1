@@ -116,36 +116,6 @@ reportextension 70101 "COL Whse.-Source - Create Doc." extends "Whse.-Source - C
                             if COLPickLocationCodeFilter <> '' then
                                 Zone.Get(COLPickLocationCodeFilter, COLPickZoneCodeFilter);
                     end;
-
-
-                    // trigger OnLookup(var Text: Text): Boolean
-                    // var
-                    //     Zone: Record Zone;
-                    //     ZoneFilter: Text;
-                    // begin
-                    //     Zone.SetRange("Location Code", COLPickLocationCodeFilter);
-                    //     ZoneFilter := GetZonesFilterFromComponentLines();
-                    //     if ZoneFilter <> '' then
-                    //         Zone.SetFilter(Code, ZoneFilter);
-                    //     if Page.RunModal(0, Zone) = Action::LookupOK then
-                    //         COLPickZoneCodeFilter := Zone.Code;
-                    // end;
-
-                    // trigger OnValidate()
-                    // var
-                    //     Zone: Record Zone;
-                    //     ZoneList: List of [Code[10]];
-                    //     ZoneErr: Label 'Selected zone ''%1'' is not present on component lines for production order %2.', Comment = '%1 = Zone Code; %2 = Production Order No.';
-                    // begin
-                    //     if COLPickZoneCodeFilter <> '' then
-                    //         if COLPickLocationCodeFilter <> '' then begin
-                    //             ZoneList := GetZoneListFromComponentLines();
-                    //             if ZoneList.Count() > 0 then
-                    //                 if not ZoneList.Contains(COLPickZoneCodeFilter) then
-                    //                     Error(ZoneErr, COLPickZoneCodeFilter, COLProdOrderHeader."No.");
-                    //             Zone.Get(COLPickLocationCodeFilter, COLPickZoneCodeFilter);
-                    //         end;
-                    // end;
                 }
                 field("COL Pick Per Zone"; COLPerZone)
                 {
@@ -166,7 +136,7 @@ reportextension 70101 "COL Whse.-Source - Create Doc." extends "Whse.-Source - C
     protected var
         COLProdOrderHeader: Record "Production Order";
         COLCreatePickHandler: Codeunit "COL Create Pick Handler";
-        // COLWhseSourceCreateDocEvents: Codeunit "COL WhseSourceCreateDoc Events";
+        //COLWhseSourceCreateDocEvents: Codeunit "COL WhseSourceCreateDoc Events";
         COLCreatePickWhseRelPO: Codeunit "COL Create Pick Whse. Rel. PO";
         COLCreatePicSM: Codeunit "COL Create Pic SM";
         COLPickLocationCodeFilter: Code[10];

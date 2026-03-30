@@ -13,14 +13,5 @@ pageextension 70109 "COL Whse. Receipt Subform" extends "Whse. Receipt Subform"
                 ApplicationArea = All;
             }
         }
-
-        addafter("Bin Code")
-        {
-            field("COL Serial No. Required"; Rec."COL Serial No. Required")
-            {
-                ApplicationArea = All;
-                Editable = false;
-            }
-        }
     }
 }

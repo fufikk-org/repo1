@@ -62,7 +62,7 @@ page 70260 "COL Cable Label Templates"
 
                     LineNo := 10000;
 
-                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"17", LineNo, 'mm', CableLabelTemplate.Condition::Always, 5, 4, 0.90);
+                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"17", LineNo, 'mm', CableLabelTemplate.Condition::Always, 20, 10, 2.09);
                     LineNo += 10000;
                     InsertTemplateLine(CableLabelTemplate."Cable Size"::"17", LineNo, 'zO', CableLabelTemplate.Condition::Always, 0, 0, 0);
                     LineNo += 10000;
@@ -74,13 +74,15 @@ page 70260 "COL Cable Label Templates"
                     LineNo += 10000;
                     InsertTemplateLine(CableLabelTemplate."Cable Size"::"17", LineNo, 'Se;0.00,0.00,{FULLLENGTH},{FULLLENGTH},17.00;WMS 19,1 (EX30)R', CableLabelTemplate.Condition::Always, 0, 0, 0);
                     LineNo += 10000;
+                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"17", LineNo, 'Cs,0.00', CableLabelTemplate.Condition::Always, 0, 0, 0);
+                    LineNo += 10000;
                     InsertTemplateLine(CableLabelTemplate."Cable Size"::"17", LineNo, 'C1,0.00,0.00', CableLabelTemplate.Condition::Always, 0, 0, 0);
                     LineNo += 10000;
-                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"17", LineNo, 'T 5,{TEXTLENGTH},90,5,pt13,q40; P/N: {ITEMNO} / REV: {VARIANT}', CableLabelTemplate.Condition::"If Variant", 0, 0, 0);
+                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"17", LineNo, 'T 5,{TEXTLENGTH},90,3,pt12; P/N: {ITEMNO} / REV: {VARIANT}', CableLabelTemplate.Condition::"If Variant", 0, 0, 0);
                     LineNo += 10000;
-                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"17", LineNo, 'T 5,{TEXTLENGTH},90,5,pt13,q40; P/N: {ITEMNO}', CableLabelTemplate.Condition::"If Not Variant", 0, 0, 0);
+                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"17", LineNo, 'T 5,{TEXTLENGTH},90,3,pt12; P/N: {ITEMNO}', CableLabelTemplate.Condition::"If Not Variant", 0, 0, 0);
                     LineNo += 10000;
-                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"17", LineNo, 'T 10,{TEXTLENGTH},90,5,pt13,q40; S/N: {SERIALNO} / ODA: R1121', CableLabelTemplate.Condition::"If Serial No", 0, 0, 0);
+                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"17", LineNo, 'T 10,{TEXTLENGTH},90,3,pt12; S/N: {SERIALNO} / ODA:', CableLabelTemplate.Condition::"If Serial No", 0, 0, 0);
                     LineNo += 10000;
                     InsertTemplateLine(CableLabelTemplate."Cable Size"::"17", LineNo, 'A1', CableLabelTemplate.Condition::Always, 0, 0, 0);
                     Message(Template17mmCreatedMsg);
@@ -109,7 +111,7 @@ page 70260 "COL Cable Label Templates"
 
                     LineNo := 10000;
 
-                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"31", LineNo, 'mm', CableLabelTemplate.Condition::Always, 15, 10, 1.90);
+                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"31", LineNo, 'mm', CableLabelTemplate.Condition::Always, 20, 10, 4.77);
                     LineNo += 10000;
                     InsertTemplateLine(CableLabelTemplate."Cable Size"::"31", LineNo, 'zO', CableLabelTemplate.Condition::Always, 0, 0, 0);
                     LineNo += 10000;
@@ -121,13 +123,15 @@ page 70260 "COL Cable Label Templates"
                     LineNo += 10000;
                     InsertTemplateLine(CableLabelTemplate."Cable Size"::"31", LineNo, 'Se;0.00,0.00,{FULLLENGTH},{FULLLENGTH},31.20;WMS 19,1 (EX30)R', CableLabelTemplate.Condition::Always, 0, 0, 0);
                     LineNo += 10000;
+                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"31", LineNo, 'Cs,0.00', CableLabelTemplate.Condition::Always, 0, 0, 0);
+                    LineNo += 10000;
                     InsertTemplateLine(CableLabelTemplate."Cable Size"::"31", LineNo, 'C1,0.00,0.00', CableLabelTemplate.Condition::Always, 0, 0, 0);
                     LineNo += 10000;
-                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"31", LineNo, 'T 10,{TEXTLENGTH},90,5,pt25,q40; P/N: {ITEMNO} / REV: {VARIANT}', CableLabelTemplate.Condition::"If Variant", 0, 0, 0);
+                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"31", LineNo, 'T 10,{TEXTLENGTH},90,3,pt25; P/N: {ITEMNO} / REV: {VARIANT}', CableLabelTemplate.Condition::"If Variant", 0, 0, 0);
                     LineNo += 10000;
-                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"31", LineNo, 'T 10,{TEXTLENGTH},90,5,pt25,q40; P/N: {ITEMNO}', CableLabelTemplate.Condition::"If Not Variant", 0, 0, 0);
+                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"31", LineNo, 'T 10,{TEXTLENGTH},90,3,pt25; P/N: {ITEMNO}', CableLabelTemplate.Condition::"If Not Variant", 0, 0, 0);
                     LineNo += 10000;
-                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"31", LineNo, 'T 20,{TEXTLENGTH},90,5,pt25,q40; S/N: {SERIALNO} / ODA: R1121', CableLabelTemplate.Condition::"If Serial No", 0, 0, 0);
+                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"31", LineNo, 'T 20,{TEXTLENGTH},90,3,pt25; S/N: {SERIALNO} / ODA:', CableLabelTemplate.Condition::"If Serial No", 0, 0, 0);
                     LineNo += 10000;
                     InsertTemplateLine(CableLabelTemplate."Cable Size"::"31", LineNo, 'A1', CableLabelTemplate.Condition::Always, 0, 0, 0);
                     Message(TemplateCreatedMsg);
@@ -156,7 +160,7 @@ page 70260 "COL Cable Label Templates"
 
                     LineNo := 10000;
 
-                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"81", LineNo, 'mm', CableLabelTemplate.Condition::Always, 20, 10, 5.00);
+                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"81", LineNo, 'mm', CableLabelTemplate.Condition::Always, 20, 10, 6);
                     LineNo += 10000;
                     InsertTemplateLine(CableLabelTemplate."Cable Size"::"81", LineNo, 'zO', CableLabelTemplate.Condition::Always, 0, 0, 0);
                     LineNo += 10000;
@@ -166,15 +170,17 @@ page 70260 "COL Cable Label Templates"
                     LineNo += 10000;
                     InsertTemplateLine(CableLabelTemplate."Cable Size"::"81", LineNo, 'O P', CableLabelTemplate.Condition::Always, 0, 0, 0);
                     LineNo += 10000;
-                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"81", LineNo, 'Se;0.00,0.00,{FULLLENGTH},{FULLLENGTH},81.00;WMS 19,1 (EX30)R', CableLabelTemplate.Condition::Always, 0, 0, 0);
+                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"81", LineNo, 'Se;0.00,0.00,480.00,480.00,81.00;WMS 19,1 (EX30)R', CableLabelTemplate.Condition::Always, 0, 0, 0);
+                    LineNo += 10000;
+                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"81", LineNo, 'Cs,0.00', CableLabelTemplate.Condition::Always, 0, 0, 0);
                     LineNo += 10000;
                     InsertTemplateLine(CableLabelTemplate."Cable Size"::"81", LineNo, 'C1,0.00,0.00', CableLabelTemplate.Condition::Always, 0, 0, 0);
                     LineNo += 10000;
-                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"81", LineNo, 'T 20,{TEXTLENGTH},90,5,pt62,q40; P/N: {ITEMNO} / REV: {VARIANT}', CableLabelTemplate.Condition::"If Variant", 0, 0, 0);
+                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"81", LineNo, 'T 20,460,90,3,pt62; P/N: {ITEMNO} / REV: {VARIANT}', CableLabelTemplate.Condition::"If Variant", 0, 0, 0);
                     LineNo += 10000;
-                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"81", LineNo, 'T 20,{TEXTLENGTH},90,5,pt62,q40; P/N: {ITEMNO}', CableLabelTemplate.Condition::"If Not Variant", 0, 0, 0);
+                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"81", LineNo, 'T 20,460,90,3,pt62; P/N: {ITEMNO}', CableLabelTemplate.Condition::"If Not Variant", 0, 0, 0);
                     LineNo += 10000;
-                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"81", LineNo, 'T 50,{TEXTLENGTH},90,5,pt62,q40; S/N: {SERIALNO} / ODA: R1121', CableLabelTemplate.Condition::"If Serial No", 0, 0, 0);
+                    InsertTemplateLine(CableLabelTemplate."Cable Size"::"81", LineNo, 'T 50,460,90,3,pt62; S/N: {SERIALNO} / ODA:', CableLabelTemplate.Condition::"If Serial No", 0, 0, 0);
                     LineNo += 10000;
                     InsertTemplateLine(CableLabelTemplate."Cable Size"::"81", LineNo, 'A1', CableLabelTemplate.Condition::Always, 0, 0, 0);
                     Message(Template81mmCreatedMsg);

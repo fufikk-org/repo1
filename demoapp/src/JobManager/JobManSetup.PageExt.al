@@ -23,10 +23,6 @@ pageextension 70236 "COL JobManSetup" extends JobManSetup
                         ApplicationArea = All;
                         Enabled = Rec."COL Duplicate Resource Allowed";
                     }
-                    field("COL Error on Blocked Job"; Rec."COL Error on Blocked Job")
-                    {
-                        ApplicationArea = All;
-                    }
                 }
             }
         }

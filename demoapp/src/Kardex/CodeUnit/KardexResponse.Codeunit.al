@@ -224,8 +224,8 @@ codeunit 70201 "COL Kardex Response"
         ItemJnlLine."COL Logia User ID" := KardexMsgLine."User Id";
         ItemJnlLine.Insert(true);
 
-        if (KardexMsgLine."Serial Number" <> '') then;
-        AddItemTrkgToItemJnlLine(ItemJnlLine, '', KardexMsgLine."Serial Number", '', '', 0D);
+        if (KardexMsgLine."Serial Number" <> '') then
+            AddItemTrkgToItemJnlLine(ItemJnlLine, '', KardexMsgLine."Serial Number", '', '', 0D);
 
     end;
 

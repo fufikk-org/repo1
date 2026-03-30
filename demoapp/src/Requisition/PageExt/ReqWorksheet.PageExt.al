@@ -4,7 +4,6 @@ using Microsoft.Inventory.Requisition;
 using Microsoft.Inventory.Item.Attribute;
 using Microsoft.Inventory.Item;
 using System.Reflection;
-using Microsoft.Inventory.Tracking;
 using System.Environment;
 using Weibel.Inventory.Item.Attribute;
 using Microsoft.Purchases.Document;
@@ -13,6 +12,7 @@ using Weibel.Inventory.Item;
 using Weibel.Inventory.Planning;
 using Microsoft.Inventory.Planning;
 using Microsoft.Manufacturing.Planning;
+using Microsoft.Inventory.Tracking;
 
 pageextension 70137 "COL Req.Worksheet" extends "Req. Worksheet"
 {
@@ -41,13 +41,13 @@ pageextension 70137 "COL Req.Worksheet" extends "Req. Worksheet"
             {
                 ApplicationArea = All;
             }
-
             field("COL Qty. On Purch. Order"; Rec."COL Qty. On Purch. Order")
             {
                 ApplicationArea = All;
             }
 #pragma warning disable AA0218
         }
+
         addafter("Variant Code")
         {
             field("COL Product Life Cycle"; Rec."COL Product Life Cycle")
@@ -317,11 +317,9 @@ pageextension 70137 "COL Req.Worksheet" extends "Req. Worksheet"
         Counter: array[3] of Integer;
     begin
         StartTime := CurrentDateTime;
-
         ReqLine.SetRange("Worksheet Template Name", Rec."Worksheet Template Name");
         ReqLine.SetRange("Journal Batch Name", Rec."Journal Batch Name");
         ReqLine.ModifyAll("Accept Action Message", false);
-
         Window.Open(ProgressLbl);
         Window.Update(2, ReqLine.Count);
         Window.Update(1, 1);
@@ -330,7 +328,6 @@ pageextension 70137 "COL Req.Worksheet" extends "Req. Worksheet"
                 Counter[3] += 1;
                 if Counter[3] MOD 10 = 0 then
                     Window.Update(1, Counter[3]);
-
                 case false of
                     ReqLine.Type = ReqLine.Type::Item,
                     ReqLine."Action Message" = ReqLine."Action Message"::New,
@@ -345,7 +342,6 @@ pageextension 70137 "COL Req.Worksheet" extends "Req. Worksheet"
                 end;
             until ReqLine.Next() = 0;
         Window.Close();
-
         Message(SummaryInfoLbl, Counter[1], Counter[3], CurrentDateTime - StartTime);
     end;
 }

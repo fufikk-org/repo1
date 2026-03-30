@@ -282,7 +282,6 @@ codeunit 70118 "COL Common Cust. Mgt"
         Rec."COL GS. Country/Region" := Cust."Country/Region Code";
         Rec."COL GS. County" := Cust."County";
         Rec."COL GS. E-Mail" := Cust."E-Mail";
-        Rec.Validate("COL GS. Salesperson Code", Cust."Salesperson Code");
     end;
 
     procedure CopyFromCustToGs(var Rec: Record "Service Header"; var Cust: Record Customer temporary)
@@ -297,7 +296,6 @@ codeunit 70118 "COL Common Cust. Mgt"
         Rec."COL GS. Country/Region" := Cust."Country/Region Code";
         Rec."COL GS. County" := Cust."County";
         Rec."COL GS. E-Mail" := Cust."E-Mail";
-        Rec.Validate("COL GS. Salesperson Code", Cust."Salesperson Code");
     end;
 
     procedure ClearGs(var Rec: Record "Sales Header")
@@ -312,7 +310,6 @@ codeunit 70118 "COL Common Cust. Mgt"
         Rec."COL GS. Country/Region" := '';
         Rec."COL GS. County" := '';
         Rec."COL GS. E-Mail" := '';
-        Rec.Validate("COL GS. Salesperson Code", '');
     end;
 
     procedure ClearGs(var Rec: Record "Service Header")
@@ -327,7 +324,6 @@ codeunit 70118 "COL Common Cust. Mgt"
         Rec."COL GS. Country/Region" := '';
         Rec."COL GS. County" := '';
         Rec."COL GS. E-Mail" := '';
-        Rec.Validate("COL GS. Salesperson Code", '');
     end;
 
     local procedure FindCustomers(FromCompany: Text[30]; var TempCustomer: Record Customer temporary): Boolean

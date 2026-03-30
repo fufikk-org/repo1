@@ -1,5 +1,5 @@
 namespace Weibel.Sales.History;
-using Weibel.Foundation.SalesResponsibilityGroup;
+
 using Microsoft.Sales.History;
 using Weibel.Shipping;
 using Weibel.Common;
@@ -8,7 +8,6 @@ using Microsoft.Foundation.Address;
 using Weibel.Packaging;
 using Weibel.Inventory.Item;
 using System.Environment;
-using Microsoft.CRM.Team;
 
 tableextension 70114 "COL Sales Shipment Header" extends "Sales Shipment Header"
 {
@@ -236,23 +235,6 @@ tableextension 70114 "COL Sales Shipment Header" extends "Sales Shipment Header"
         // field(70141; "COL Order Information"; Text[50])
         // field(70142; "COL Responsibility Group"; Enum "COL Resp. Group Option")
         // field(70147; "COL Order Category (Old)"; Code[20])
-        field(70151; "COL Sales Resp. Group"; Code[20])
-        {
-            Caption = 'Sales Responsibility Group';
-            DataClassification = CustomerContent;
-            ToolTip = 'Specifies the sales responsibility group for the sales document.';
-            TableRelation = "COL Sales Resp. Group";
-            ValidateTableRelation = false;
-            Editable = false;
-        }
-        field(70154; "COL GS. Salesperson Code"; Code[20])
-        {
-            Caption = 'Salesperson Code';
-            ToolTip = 'Specifies the salesperson code.';
-            DataClassification = CustomerContent;
-            TableRelation = "Salesperson/Purchaser" where(Blocked = const(false));
-            ValidateTableRelation = false;
-        }
     }
 
     procedure COLGetHighestPriority(): Text

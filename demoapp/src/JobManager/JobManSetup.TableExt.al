@@ -26,11 +26,5 @@ tableextension 70165 "COL JobManSetup" extends JobManSetup
                 Rec.TestField("COL Duplicate Resource Allowed");
             end;
         }
-        field(70102; "COL Error on Blocked Job"; Boolean)
-        {
-            Caption = 'Error on Blocked Job';
-            ToolTip = 'Specifies whether to show an error when the job is blocked.';
-            DataClassification = SystemMetadata;
-        }
     }
 }

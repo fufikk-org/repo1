@@ -39,6 +39,7 @@ codeunit 70141 "COL Intercompany Post"
 
         IntercompanyTransactions.TestField("Destination Customer No.");
         IntercompanyTransactions.TestField("Document No.");
+        IntercompanyTransactions.TestField(Amount);
         IntercompanyTransactions.TestField("Sales GL Account No.");
         IntercompanyTransactions.TestField("Purchase GL Account No.");
         IntercompanyTransactions.TestField("IC GL Account No.");
@@ -128,11 +129,12 @@ codeunit 70141 "COL Intercompany Post"
 
         case IntercompanyTransactions."Transaction Document Type" of
             IntercompanyTransactions."Transaction Document Type"::"Service Invoice",
-            IntercompanyTransactions."Transaction Document Type"::"Sales Invoice":
+           IntercompanyTransactions."Transaction Document Type"::"Sales Invoice":
                 GenJournalLine.Validate("Document Type", GenJournalLine."Document Type"::Invoice);
             IntercompanyTransactions."Transaction Document Type"::"Sales Cr. Memo":
                 GenJournalLine.Validate("Document Type", GenJournalLine."Document Type"::"Credit Memo");
         end;
+
         GenJournalLine.Validate("Document No.", IntercompanyTransactions."Document No.");
         GenJournalLine.Validate("Posting Date", IntercompanyTransactions."Posting Date");
         GenJournalLine.Validate("Account Type", GenJournalLine."Account Type"::Customer);
@@ -143,7 +145,6 @@ codeunit 70141 "COL Intercompany Post"
         GenJournalLine.Validate("Bal. Account Type", GenJournalLine."Bal. Account Type"::"G/L Account");
         GenJournalLine.Validate("Bal. Account No.", IntercompanyTransactions."Sales GL Account No.");
         GenJournalLine.Validate(Description, IntercompanyTransactions."Posting Description");
-        GenJournalLine.Validate("Allow Zero-Amount Posting", true);
         GenJournalLine.Insert(true);
     end;
 
@@ -195,7 +196,6 @@ codeunit 70141 "COL Intercompany Post"
         GenJournalLine2.Validate("Bal. Account Type", GenJournalLine2."Bal. Account Type"::"G/L Account");
         GenJournalLine2.Validate("Bal. Account No.", IntercompanyTransactions."IC GL Account No.");
         GenJournalLine2.Validate(Description, IntercompanyTransactions."Posting Description");
-        GenJournalLine2.Validate("Allow Zero-Amount Posting", true);
         GenJournalLine2.Insert(true);
     end;
 }

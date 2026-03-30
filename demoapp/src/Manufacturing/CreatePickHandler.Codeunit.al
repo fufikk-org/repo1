@@ -5,7 +5,6 @@ using Microsoft.Manufacturing.Routing;
 using Microsoft.Warehouse.Request;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Warehouse.Worksheet;
-using Weibel.Warehouse.Activity;
 
 codeunit 70102 "COL Create Pick Handler"
 {
@@ -27,13 +26,6 @@ codeunit 70102 "COL Create Pick Handler"
         WhseWorksheetLine."COL Routing Link Code" := ProdOrderComponent."Routing Link Code";
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Create Pick", OnCreateWhseActivHeaderOnAfterWhseActivHeaderInsert, '', false, false)]
-    local procedure OnCreateWhseActivHeaderOnAfterWhseActivHeaderInsert(var WhseActivHeader: Record "Warehouse Activity Header"; var TempWhseActivLine: Record "Warehouse Activity Line" temporary; CreatePickParameters: Record "Create Pick Parameters")
-    var
-        COLStaticCreatePicSM: Codeunit "COL Create Pic SM";
-    begin
-        COLStaticCreatePicSM.SetPickToPrintFilter(UserId(), WhseActivHeader."No.");
-    end;
 
     local procedure TransferCustomCode(var WarehouseActivityHeader: Record "Warehouse Activity Header"; var WarehouseRequest: Record "Warehouse Request")
     begin
@@ -108,22 +100,5 @@ codeunit 70102 "COL Create Pick Handler"
 
         exit(false);
     end;
-
-    procedure CheckProdRoutCodes(WorkCenterCode: Text; var ProductionLine: Record "Prod. Order Line"): Boolean
-    var
-        RoutingLine: Record "Routing Line";
-        ProdOrderRoutingLine: Record "Prod. Order Routing Line";
-    begin
-        ProdOrderRoutingLine.SetRange(Type, RoutingLine.Type::"Work Center");
-        ProdOrderRoutingLine.SetFilter("No.", WorkCenterCode);
-        ProdOrderRoutingLine.SetRange("Prod. Order No.", ProductionLine."Prod. Order No.");
-        ProdOrderRoutingLine.SetRange("Routing Reference No.", ProductionLine."Routing Reference No.");
-        ProdOrderRoutingLine.SetRange("Routing No.", ProductionLine."Routing No.");
-        if not RoutingLine.IsEmpty() then
-            exit(true);
-
-        exit(false);
-    end;
-
 
 }

@@ -3,7 +3,6 @@ namespace Weibel.Intercompany;
 using Weibel.Common;
 using Microsoft.Sales.History;
 using Microsoft.Finance.Currency;
-using Microsoft.CRM.Team;
 
 table 70114 "COL Intercompany Transactions"
 {
@@ -103,13 +102,6 @@ table 70114 "COL Intercompany Transactions"
             Caption = 'IC GL Account No.';
             ToolTip = 'Specifies the IC GL Account No.';
         }
-        field(70134; "Destination Salesperson Code"; Code[20])
-        {
-            Caption = 'Destination Salesperson Code';
-            ToolTip = 'Specifies the destination salesperson code.';
-            TableRelation = "Salesperson/Purchaser" where(Blocked = const(false));
-            ValidateTableRelation = false;
-        }
     }
 
     keys
@@ -138,7 +130,7 @@ table 70114 "COL Intercompany Transactions"
         Rec."Destination Company" := SalesCrMemoHeader."COL GS. Company";
         Rec."Destination Customer No." := SalesCrMemoHeader."COL GS. Customer No.";
         Rec."Destination Customer Name" := SalesCrMemoHeader."COL GS. Name";
-        Rec."Destination Salesperson Code" := SalesCrMemoHeader."COL GS. Salesperson Code";
+
         SalesCrMemoHeader.CalcFields(Amount);
         DocumentAmount := SalesCrMemoHeader.Amount;
 

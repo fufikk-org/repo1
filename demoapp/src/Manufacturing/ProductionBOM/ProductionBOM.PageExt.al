@@ -2,8 +2,8 @@ namespace Weibel.Manufacturing.ProductionBOM;
 
 using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Inventory.Item.Catalog;
-using Microsoft.Inventory.Item;
 using Weibel.Inventory.Item;
+using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Location;
 
 pageextension 70162 "COL Production BOM" extends "Production BOM"
@@ -81,10 +81,6 @@ pageextension 70162 "COL Production BOM" extends "Production BOM"
         addlast(Category_Process)
         {
             actionref("COL Print BOM_Promoted"; "COL Print BOM") { }
-        }
-        addafter("Copy &BOM_Promoted")
-        {
-            actionref("COL Import Production BOM_Promoted"; "COL Import Production BOM") { }
         }
     }
 

@@ -24,41 +24,37 @@ pageextension 70186 "COL Purchase Order" extends "Purchase Order"
                 ApplicationArea = All;
                 ToolTip = 'Number of times the document has been printed.';
             }
-            group(COLPOReminder)
+            field("COL Missing Conf. Remi.Sent"; Rec."COL Missing Conf. Remi.Sent")
             {
-                Caption = 'PO Reminders';
-                field("COL Missing Conf. Remi.Sent"; Rec."COL Missing Conf. Remi.Sent")
-                {
-                    ApplicationArea = All;
+                ApplicationArea = All;
 
-                    trigger OnDrillDown()
-                    var
-                        ReminderMgt: Codeunit "COL Purch. Reminder Mgt.";
-                    begin
-                        ReminderMgt.OpenLookUpMails(Rec, Enum::"COL Email Type"::"Purch. Missing Conf. Reminder");
-                    end;
-                }
-                field("COL Missing Conf. - Date"; Rec."COL Missing Conf. - Date")
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                }
-                field("COL Overdue Delivery Remi.Sent"; Rec."COL Overdue Delivery Remi.Sent")
-                {
-                    ApplicationArea = All;
+                trigger OnDrillDown()
+                var
+                    ReminderMgt: Codeunit "COL Purch. Reminder Mgt.";
+                begin
+                    ReminderMgt.OpenLookUpMails(Rec, Enum::"COL Email Type"::"Purch. Missing Conf. Reminder");
+                end;
+            }
+            field("COL Missing Conf. - Date"; Rec."COL Missing Conf. - Date")
+            {
+                ApplicationArea = All;
+                Editable = false;
+            }
+            field("COL Overdue Delivery Remi.Sent"; Rec."COL Overdue Delivery Remi.Sent")
+            {
+                ApplicationArea = All;
 
-                    trigger OnDrillDown()
-                    var
-                        ReminderMgt: Codeunit "COL Purch. Reminder Mgt.";
-                    begin
-                        ReminderMgt.OpenLookUpMails(Rec, Enum::"COL Email Type"::"Purch. Overdue Delivery Reminder");
-                    end;
-                }
-                field("COL Overdue Delivery - Date"; Rec."COL Overdue Delivery - Date")
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                }
+                trigger OnDrillDown()
+                var
+                    ReminderMgt: Codeunit "COL Purch. Reminder Mgt.";
+                begin
+                    ReminderMgt.OpenLookUpMails(Rec, Enum::"COL Email Type"::"Purch. Overdue Delivery Reminder");
+                end;
+            }
+            field("COL Overdue Delivery - Date"; Rec."COL Overdue Delivery - Date")
+            {
+                ApplicationArea = All;
+                Editable = false;
             }
         }
     }

@@ -1,11 +1,9 @@
 namespace Weibel.Inventory.Item;
-
 page 70264 "COL Blocking Reason Dialog"
 {
     ApplicationArea = All;
     Caption = 'Enter Blocking Change Reason';
     PageType = StandardDialog;
-
     layout
     {
         area(Content)
@@ -13,7 +11,6 @@ page 70264 "COL Blocking Reason Dialog"
             group(General)
             {
                 Caption = 'General';
-
                 field(Reason; ReasonText)
                 {
                     ApplicationArea = All;
@@ -24,7 +21,6 @@ page 70264 "COL Blocking Reason Dialog"
             }
         }
     }
-
     var
         ReasonText: Text[80];
 

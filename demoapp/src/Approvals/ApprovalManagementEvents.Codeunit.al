@@ -13,18 +13,10 @@ codeunit 70167 "COL Approval Management Events"
     local procedure ApprovalMgmtOnApproveApprovalRequest(var ApprovalEntry: Record "Approval Entry")
     var
         ApprovalEntryToUpdate: Record "Approval Entry";
-        PurchaseHeader: Record "Purchase Header";
-        FinanceApprovalBlockedErr: Label 'This invoice cannot be approved because Finance Approval is blocked and not yet resolved.';
     begin
         ApprovalEntryToUpdate.Copy(ApprovalEntry);
         if not ApprovalEntryToUpdate.FindFirst() then
             exit;
-
-        if ApprovalEntryToUpdate."Table ID" = Database::"Purchase Header" then
-            if ApprovalEntryToUpdate."Document Type" = Enum::"Approval Document Type"::Invoice then
-                if PurchaseHeader.Get(Enum::"Purchase Document Type"::Invoice, ApprovalEntryToUpdate."Document No.") then
-                    if PurchaseHeader."COL Finance Approval Blocked" and not PurchaseHeader."COL Finance Approval Resolved" then
-                        Error(FinanceApprovalBlockedErr);
 
         if ApprovalEntryToUpdate."Approval Type" <> ApprovalEntryToUpdate."Approval Type"::"Workflow User Group" then
             exit;

@@ -12,7 +12,6 @@ using Weibel.Packaging;
 using Microsoft.Warehouse.Activity;
 using Weibel.Inventory.Item;
 using System.Environment;
-using Microsoft.CRM.Team;
 
 tableextension 70119 "COL Service Header" extends "Service Header"
 {
@@ -351,19 +350,6 @@ tableextension 70119 "COL Service Header" extends "Service Header"
             begin
                 Rec.TestField("COL GS. Company");
                 CommonCustMgt.PickCompanyCustomer(Rec."COL GS. Company", Rec);
-            end;
-        }
-        field(70134; "COL GS. Salesperson Code"; Code[20])
-        {
-            Caption = 'Salesperson Code';
-            ToolTip = 'Specifies the salesperson code.';
-            DataClassification = CustomerContent;
-            TableRelation = "Salesperson/Purchaser" where(Blocked = const(false));
-            ValidateTableRelation = false;
-            trigger OnValidate()
-            begin
-                if "COL GS. Salesperson Code" <> '' then
-                    Validate("Salesperson Code", "COL GS. Salesperson Code");
             end;
         }
     }

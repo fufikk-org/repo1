@@ -53,7 +53,6 @@ pageextension 70184 "COL Released Production Order" extends "Released Production
                 }
             }
         }
-
         addafter("No.")
         {
             field("COL Internal Status"; Rec."COL Internal Status")

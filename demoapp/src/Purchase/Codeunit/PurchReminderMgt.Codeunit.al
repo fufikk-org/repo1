@@ -5,7 +5,6 @@ using Microsoft.Foundation.Reporting;
 using weibel.System.Email;
 using System.Email;
 using Weibel.Common;
-using Microsoft.Purchases.Vendor;
 using System.Utilities;
 using System.Threading;
 
@@ -45,8 +44,7 @@ codeunit 70148 "COL Purch. Reminder Mgt."
     procedure SentDocument(var Rec: Record "Purchase Header"): Boolean
     var
         ReportSelections: Record "Report Selections";
-        POReminderLog: Record "COL PO Reminder Log";
-        PurchaseHeader, PurchaseHeader2 : Record "Purchase Header";
+        PurchaseHeader: Record "Purchase Header";
         DocumentSendingProfile: Record "Document Sending Profile";
         SentEmail: Record "Sent Email";
         ReportDistributionMgt: Codeunit "Report Distribution Management";
@@ -100,25 +98,6 @@ codeunit 70148 "COL Purch. Reminder Mgt."
             SentEmail."COL Related Document" := Rec."No.";
             SentEmail."COL Send Date" := CurrentDateTime();
             SentEmail.Modify();
-
-            PurchaseHeader2.SetLoadFields("Buy-from Vendor No.");
-            PurchaseHeader2.SetRange("Document Type", PurchaseHeader2."Document Type"::Order);
-            PurchaseHeader2.SetRange("No.", PurchaseHeader.GetFilter("Location Filter"));
-
-            if PurchaseHeader2.FindSet() then
-                repeat
-                    POReminderLog.Init();
-                    POReminderLog."Entry No." := 0;
-                    POReminderLog."Sent Email ID" := SentEmail.Id;
-                    POReminderLog."Message ID" := SentEmail.GetMessageId();
-                    POReminderLog."Email Type" := SentEmail."COL Email Type";
-                    POReminderLog."User Name" := CopyStr(UserId, 1, MaxStrLen(POReminderLog."User Name"));
-                    POReminderLog."Order No." := PurchaseHeader2."No.";
-                    POReminderLog."Vendor No." := PurchaseHeader2."Buy-from Vendor No.";
-                    POReminderLog."Send Date" := SentEmail."COL Send Date";
-                    POReminderLog.Insert();
-                until PurchaseHeader2.Next() = 0;
-
         end;
 
         PurchaseHeader.SetFilter("No.", Rec.GetFilter("Location Filter"));
@@ -184,28 +163,14 @@ codeunit 70148 "COL Purch. Reminder Mgt."
 
     procedure OpenLookUpMails(Rec: Record "Purchase Header"; type: enum "COL Email Type")
     var
-        POReminderLog: Record "COL PO Reminder Log";
+        SentEmail: Record "Sent Email";
+        SentEmails: Page "Sent Emails";
     begin
-        POReminderLog.FilterGroup(10);
-        POReminderLog.SetLoadFields("Email Type", "Vendor No.", "Sent Email ID");
-        POReminderLog.SetFilter("Email Type", '%1|%2', type, enum::"COL Email Type"::"Missing Conf. and Overdue Delivery");
-        POReminderLog.SetRange("Order No.", Rec."No.");
-        POReminderLog.FilterGroup(0);
+        SentEmail.SetFilter("COL Email Type", '%1|%2', type, enum::"COL Email Type"::"Missing Conf. and Overdue Delivery");
+        SentEmail.SetRange("COL Related Document", Rec."No.");
 
-        Page.Run(0, POReminderLog);
-    end;
-
-    procedure OpenLookUpMails(Rec: Record Vendor; type: enum "COL Email Type")
-    var
-        POReminderLog: Record "COL PO Reminder Log";
-    begin
-        POReminderLog.FilterGroup(10);
-        POReminderLog.SetLoadFields("Email Type", "Vendor No.", "Sent Email ID");
-        POReminderLog.SetFilter("Email Type", '%1|%2', type, enum::"COL Email Type"::"Missing Conf. and Overdue Delivery");
-        POReminderLog.SetRange("Vendor No.", Rec."No.");
-        POReminderLog.FilterGroup(0);
-
-        Page.Run(0, POReminderLog);
+        SentEmails.COLSetFilters(SentEmail);
+        SentEmails.Run();
     end;
 
     procedure GetPDfFromLasernet(var RecordVariant: Variant; var TempBlob: Codeunit "Temp Blob")

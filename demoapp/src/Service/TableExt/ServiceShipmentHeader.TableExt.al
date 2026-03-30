@@ -7,7 +7,6 @@ using Microsoft.Sales.Customer;
 using Microsoft.Foundation.Address;
 using Weibel.Packaging;
 using Weibel.Inventory.Item;
-using Microsoft.CRM.Team;
 
 tableextension 70117 "COL Service Shipment Header" extends "Service Shipment Header"
 {
@@ -223,14 +222,6 @@ tableextension 70117 "COL Service Shipment Header" extends "Service Shipment Hea
             Caption = 'Customer No.';
             ToolTip = 'Specifies the Customer No.';
             DataClassification = CustomerContent;
-        }
-        field(70134; "COL GS. Salesperson Code"; Code[20])
-        {
-            Caption = 'Salesperson Code';
-            ToolTip = 'Specifies the salesperson code.';
-            DataClassification = CustomerContent;
-            TableRelation = "Salesperson/Purchaser" where(Blocked = const(false));
-            ValidateTableRelation = false;
         }
     }
 

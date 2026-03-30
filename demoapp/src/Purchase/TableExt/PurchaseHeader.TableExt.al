@@ -27,7 +27,7 @@ tableextension 70144 "COL Purchase Header" extends "Purchase Header"
             Tooltip = 'Number of Missing Confirmation Reminder emails sent';
             BlankZero = true;
             FieldClass = FlowField;
-            CalcFormula = count("COL PO Reminder Log" where("Email Type" = filter("Purch. Missing Conf. Reminder" | "Missing Conf. and Overdue Delivery"), "Order No." = field("No.")));
+            CalcFormula = count("Sent Email" where("COL Email Type" = filter("Purch. Missing Conf. Reminder" | "Missing Conf. and Overdue Delivery"), "COL Related Document" = field("No.")));
         }
         field(70101; "COL Overdue Delivery Remi.Sent"; Integer)
         {
@@ -35,7 +35,7 @@ tableextension 70144 "COL Purchase Header" extends "Purchase Header"
             Tooltip = 'Number of Overdue Delivery Reminder emails sent';
             BlankZero = true;
             FieldClass = FlowField;
-            CalcFormula = count("COL PO Reminder Log" where("Email Type" = filter("Purch. Overdue Delivery Reminder" | "Missing Conf. and Overdue Delivery"), "Order No." = field("No.")));
+            CalcFormula = count("Sent Email" where("COL Email Type" = filter("Purch. Overdue Delivery Reminder" | "Missing Conf. and Overdue Delivery"), "COL Related Document" = field("No.")));
         }
 #pragma warning disable AA0232
         field(70102; "COL Missing Conf. - Date"; DateTime)
@@ -44,7 +44,7 @@ tableextension 70144 "COL Purchase Header" extends "Purchase Header"
             Tooltip = 'Last date the Missing Confirmation Reminder was sent';
             Editable = false;
             FieldClass = FlowField;
-            CalcFormula = Max("COL PO Reminder Log"."Send Date" where("Email Type" = filter("Purch. Missing Conf. Reminder" | "Missing Conf. and Overdue Delivery"), "Order No." = field("No.")));
+            CalcFormula = Max("Sent Email"."COL Send Date" where("COL Email Type" = filter("Purch. Missing Conf. Reminder" | "Missing Conf. and Overdue Delivery"), "COL Related Document" = field("No.")));
         }
 #pragma warning restore AA0232
         field(70103; "COL Overdue Delivery - Date"; DateTime)
@@ -53,7 +53,7 @@ tableextension 70144 "COL Purchase Header" extends "Purchase Header"
             Tooltip = 'Last date the Overdue Delivery Reminder was sent';
             Editable = false;
             FieldClass = FlowField;
-            CalcFormula = Max("COL PO Reminder Log"."Send Date" where("Email Type" = filter("Purch. Overdue Delivery Reminder" | "Missing Conf. and Overdue Delivery"), "Order No." = field("No.")));
+            CalcFormula = Max("Sent Email"."COL Send Date" where("COL Email Type" = filter("Purch. Overdue Delivery Reminder" | "Missing Conf. and Overdue Delivery"), "COL Related Document" = field("No.")));
         }
         field(70104; "COL Reminder Problem Exist"; Boolean)
         {
@@ -74,58 +74,6 @@ tableextension 70144 "COL Purchase Header" extends "Purchase Header"
         {
             Caption = 'Can Skip Re-Approval';
             ToolTip = 'Specifies if the purchase order can skip re-approval.';
-            Editable = false;
-            DataClassification = CustomerContent;
-        }
-        field(70107; "COL Finance Approval Blocked"; Boolean)
-        {
-            Caption = 'Finance Approval Blocked';
-            ToolTip = 'Specifies if the finance approval is blocked.';
-            DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                if Rec."COL Finance Approval Blocked" <> xRec."COL Finance Approval Blocked" then
-                    Rec.TestField(Status, Rec.Status::Open);
-
-                if not Rec."COL Finance Approval Blocked" then begin
-                    Rec."COL Finance Approval Resolved" := false;
-                    Rec."COL Fin. Appr. Resolved By" := '';
-                    Rec."COL Fin. Appr. Resolved Time" := 0DT;
-                end;
-            end;
-        }
-        field(70108; "COL Finance Approval Resolved"; Boolean)
-        {
-            Caption = 'Finance Approval Resolved';
-            ToolTip = 'Specifies if the finance approval has been resolved.';
-            DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                Rec.TestField("COL Finance Approval Blocked", true);
-
-                if Rec."COL Finance Approval Resolved" and not xRec."COL Finance Approval Resolved" then begin
-                    Rec."COL Fin. Appr. Resolved By" := CopyStr(UserId(), 1, MaxStrLen(Rec."COL Fin. Appr. Resolved By"));
-                    Rec."COL Fin. Appr. Resolved Time" := CurrentDateTime();
-                end;
-                if not Rec."COL Finance Approval Resolved" then begin
-                    Rec."COL Fin. Appr. Resolved By" := '';
-                    Rec."COL Fin. Appr. Resolved Time" := 0DT;
-                end;
-            end;
-        }
-        field(70109; "COL Fin. Appr. Resolved By"; Code[50])
-        {
-            Caption = 'Finance Approval Resolved By';
-            ToolTip = 'Specifies who resolved the finance approval.';
-            Editable = false;
-            DataClassification = CustomerContent;
-        }
-        field(70110; "COL Fin. Appr. Resolved Time"; DateTime)
-        {
-            Caption = 'Finance Approval Resolved Time';
-            ToolTip = 'Specifies when the finance approval was resolved.';
             Editable = false;
             DataClassification = CustomerContent;
         }

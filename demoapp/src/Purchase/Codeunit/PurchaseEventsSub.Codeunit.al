@@ -18,4 +18,5 @@ codeunit 70203 "COL Purchase Events Sub."
         Result := Result and (PurchaseHeader."Pay-to Name" = PurchaseHeader."Buy-from Vendor Name") and
             (PurchaseHeader."Pay-to Name 2" = PurchaseHeader."Buy-from Vendor Name 2");
     end;
+
 }

@@ -1,5 +1,5 @@
 namespace Weibel.Sales.History;
-using Weibel.Foundation.SalesResponsibilityGroup;
+
 using Microsoft.Sales.History;
 using Weibel.Common;
 using Microsoft.Sales.Customer;
@@ -10,7 +10,6 @@ using Weibel.Foundation.FinanceCategory;
 using Weibel.Foundation.SalesOrderCategory;
 using Weibel.Foundation.TermsAndConditions;
 using Microsoft.Foundation.Reporting;
-using Microsoft.CRM.Team;
 
 tableextension 70120 "COL Sales Invoice Header" extends "Sales Invoice Header"
 {
@@ -264,27 +263,7 @@ tableextension 70120 "COL Sales Invoice Header" extends "Sales Invoice Header"
             ToolTip = 'International Bank Account Number';
             DataClassification = CustomerContent;
         }
-        field(70151; "COL Sales Resp. Group"; Code[20])
-        {
-            Caption = 'Sales Responsibility Group';
-            DataClassification = CustomerContent;
-            ToolTip = 'Specifies the sales responsibility group for the sales document.';
-            TableRelation = "COL Sales Resp. Group";
-        }
-        field(70153; "COL I/C ACH"; Code[50])
-        {
-            Caption = 'I/C ACH';
-            ToolTip = 'ACH Routing Number for wire transfers';
-            DataClassification = CustomerContent;
-        }
-        field(70154; "COL GS. Salesperson Code"; Code[20])
-        {
-            Caption = 'Salesperson Code';
-            ToolTip = 'Specifies the salesperson code.';
-            DataClassification = CustomerContent;
-            TableRelation = "Salesperson/Purchaser" where(Blocked = const(false));
-            ValidateTableRelation = false;
-        }
+
     }
 
     keys

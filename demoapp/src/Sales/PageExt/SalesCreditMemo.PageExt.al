@@ -2,7 +2,6 @@ namespace Weibel.Sales.Document;
 
 using Microsoft.Sales.Document;
 using Weibel.Common;
-using Weibel.Intercompany;
 
 pageextension 70130 "COL Sales Credit Memo" extends "Sales Credit Memo"
 {
@@ -18,27 +17,10 @@ pageextension 70130 "COL Sales Credit Memo" extends "Sales Credit Memo"
 
         addlast(General)
         {
-            field("COL Order No."; Rec."COL Order No.")
-            {
-                ApplicationArea = All;
-            }
             group("COL Weibel")
             {
                 Caption = 'Weibel';
-                field("COL Sales Order Category"; Rec."COL Sales Order Category")
-                {
-                    ApplicationArea = All;
-                }
-                field("COL Sales Finance Category"; Rec."COL Sales Finance Category")
-                {
-                    ApplicationArea = All;
-                }
                 field("COL Project Name"; Rec."COL Project Name")
-                {
-                    ApplicationArea = All;
-                }
-
-                field("COL Sales Resp. Group"; Rec."COL Sales Resp. Group")
                 {
                     ApplicationArea = All;
                 }
@@ -167,13 +149,8 @@ pageextension 70130 "COL Sales Credit Memo" extends "Sales Credit Memo"
                 field("COL GS. Company"; Rec."COL GS. Company")
                 {
                     ApplicationArea = Basic, Suite;
-                    LookupPageId = "COL Intercompany Companies";
                 }
                 field("COL GS. Customer No."; Rec."COL GS. Customer No.")
-                {
-                    ApplicationArea = Basic, Suite;
-                }
-                field("COL GS. Salesperson Code"; Rec."COL GS. Salesperson Code")
                 {
                     ApplicationArea = Basic, Suite;
                 }
@@ -212,6 +189,17 @@ pageextension 70130 "COL Sales Credit Memo" extends "Sales Credit Memo"
             }
         }
 
+        addafter("Salesperson Code")
+        {
+            field("COL Sales Finance Category"; Rec."COL Sales Finance Category")
+            {
+                ApplicationArea = All;
+            }
+            field("COL Sales Order Category"; Rec."COL Sales Order Category")
+            {
+                ApplicationArea = All;
+            }
+        }
     }
 
     actions

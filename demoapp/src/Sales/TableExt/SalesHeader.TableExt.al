@@ -1,5 +1,5 @@
 namespace Weibel.Sales.Document;
-using Weibel.Foundation.SalesResponsibilityGroup;
+
 using Microsoft.Sales.Document;
 using System.Utilities;
 using Weibel.Shipping;
@@ -18,7 +18,6 @@ using Weibel.Foundation.FinanceCategory;
 using Weibel.Foundation.SalesOrderCategory;
 using Weibel.Foundation.TermsAndConditions;
 using Weibel.Foundation.OrderCategoryOld;
-using Microsoft.CRM.Team;
 
 tableextension 70113 "COL Sales Header" extends "Sales Header"
 {
@@ -349,13 +348,11 @@ tableextension 70113 "COL Sales Header" extends "Sales Header"
                     Rec."COL I/C Bank Name" := ICBankInformation."I/C Bank Name";
                     Rec."COL I/C SWIFT" := ICBankInformation."I/C SWIFT";
                     Rec."COL I/C IBAN" := ICBankInformation."I/C IBAN";
-                    Rec."COL I/C ACH" := ICBankInformation."I/C ACH";
                 end
                 else begin
                     Rec."COL I/C Bank Name" := '';
                     Rec."COL I/C SWIFT" := '';
                     Rec."COL I/C IBAN" := '';
-                    Rec."COL I/C ACH" := '';
                 end;
 
             end;
@@ -471,9 +468,6 @@ tableextension 70113 "COL Sales Header" extends "Sales Header"
             Caption = 'Responsibility Group';
             DataClassification = CustomerContent;
             ToolTip = 'Specifies responsibility group.';
-            ObsoleteState = Pending;
-            ObsoleteReason = 'Sales Responsibility Center';
-            AllowInCustomizations = Never;
         }
         field(70143; "COL Order Value G/L Acc.Filter"; Code[20])
         {
@@ -535,44 +529,6 @@ tableextension 70113 "COL Sales Header" extends "Sales Header"
             Caption = 'I/C IBAN';
             ToolTip = 'International Bank Account Number';
             DataClassification = CustomerContent;
-        }
-        field(70151; "COL Sales Resp. Group"; Code[20])
-        {
-            Caption = 'Sales Responsibility Group';
-            DataClassification = CustomerContent;
-            ToolTip = 'Specifies the sales responsibility group for the sales document.';
-            TableRelation = "COL Sales Resp. Group";
-        }
-        field(70152; "COL Order No."; Code[20])
-        {
-            Caption = 'Order No.';
-            DataClassification = CustomerContent;
-            ToolTip = 'Specifies the order number for the sales document.';
-        }
-        field(70153; "COL I/C ACH"; Code[50])
-        {
-            Caption = 'I/C ACH';
-            ToolTip = 'ACH Routing Number for wire transfers';
-            DataClassification = CustomerContent;
-        }
-        field(70154; "COL GS. Salesperson Code"; Code[20])
-        {
-            Caption = 'Salesperson Code';
-            ToolTip = 'Specifies the salesperson code.';
-            DataClassification = CustomerContent;
-            TableRelation = "Salesperson/Purchaser" where(Blocked = const(false));
-            ValidateTableRelation = false;
-
-            trigger OnValidate()
-            var
-                SalesHeaderDimEventSub: Codeunit "COL Sales Header Dim Event Sub";
-            begin
-                if "COL GS. Salesperson Code" <> '' then begin
-                    BindSubscription(SalesHeaderDimEventSub);
-                    Validate("Salesperson Code", "COL GS. Salesperson Code");
-                    UnbindSubscription(SalesHeaderDimEventSub);
-                end;
-            end;
         }
     }
 

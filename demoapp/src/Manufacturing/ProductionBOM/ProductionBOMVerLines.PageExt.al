@@ -24,9 +24,9 @@ pageextension 70189 "COL Production BOM Ver. Lines" extends "Production BOM Vers
             }
             field("COL EU RoHS Status"; (Rec."Variant Code" = '') ? Rec."COL EU RoHS Status" : Rec."COL V.EU RoHS Status")
             {
+                ApplicationArea = All;
                 Caption = 'EU RoHS Status';
                 ToolTip = 'Specifies the value of the EU RoHS Status field from related item.';
-                ApplicationArea = All;
                 HideValue = Rec.Type <> Rec.Type::Item;
                 Lookup = false;
                 DrillDown = false;

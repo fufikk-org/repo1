@@ -28,7 +28,6 @@ pageextension 70136 "COL Planning Worksheet" extends "Planning Worksheet"
                 {
                     Caption = 'Filters';
                     GridLayout = Columns;
-
                     field("COL FilterActionMessage"; FilterActionMessage)
                     {
                         ApplicationArea = All;
@@ -95,7 +94,6 @@ pageextension 70136 "COL Planning Worksheet" extends "Planning Worksheet"
                 }
             }
         }
-
         addfirst(factboxes)
         {
             part(COLSKUReplenishmentFB; "COL SKU Replenishment FactBox")
@@ -117,7 +115,6 @@ pageextension 70136 "COL Planning Worksheet" extends "Planning Worksheet"
         {
             Visible = false;
         }
-
         addafter("Ref. Order Status")
         {
             field("COL First Opr. Work Center"; Rec."COL First Opr. Work Center")
@@ -131,6 +128,7 @@ pageextension 70136 "COL Planning Worksheet" extends "Planning Worksheet"
                 Editable = false;
             }
         }
+
 
         addafter("Variant Code")
         {
@@ -439,20 +437,18 @@ pageextension 70136 "COL Planning Worksheet" extends "Planning Worksheet"
     var
         Item: Record Item;
     begin
+
         if Rec."Variant Code" = '' then
             VariantCodeMandatory2 := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
 
         if FilterWorkCenterNo <> '' then
             if Rec.GetFilter("COL First Opr. Work Center") = '' then
                 FilterWorkCenterNo := '';
-
         if FilterWorkCenterGroupCode <> '' then
             if Rec.GetFilter("COL First Opr. Wrk Center Grp") = '' then
                 FilterWorkCenterGroupCode := '';
-
         if Rec.GetFilter("Action Message") = '' then
             FilterActionMessage := Enum::"Action Message Type"::" ";
-
         if Rec.GetFilter("Ref. Order Status") = '' then
             FilterStatus := Enum::"COL Production Order Status"::" ";
     end;
@@ -471,7 +467,6 @@ pageextension 70136 "COL Planning Worksheet" extends "Planning Worksheet"
         Rec.FilterGroup(2);
         RequisitionLine.CopyFilters(Rec);
         Rec.FilterGroup(0);
-
         if RequisitionLine.FindSet() then
             repeat
                 if (RequisitionLine."COL First Opr. Work Center" = '') or (RequisitionLine."COL First Opr. Wrk Center Grp" = '') then begin
@@ -489,7 +484,6 @@ pageextension 70136 "COL Planning Worksheet" extends "Planning Worksheet"
         Rec.SetRange("Ref. Order Status");
 
         FilterActionMessage := Enum::"Action Message Type"::" ";
-        FilterStatus := Enum::"COL Production Order Status"::" ";
         FilterStatus := Enum::"COL Production Order Status"::" ";
         FilterWorkCenterNo := '';
         FilterWorkCenterGroupCode := '';

@@ -36,9 +36,9 @@ codeunit 70124 "COL Install App"
         UpdateSalesOrderInformationField();
         UpdateSalesOrderResponsibilityGroupField();
         UpdateSalesOrderOrderCategoryOldField();
-        UpdateSalesSetupForCustomerSearch();
-        UpdatePurchaseSetupForVendorSearch();
         AddOrderCategoriesOldForSalesOrders();
+        UpdatePurchaseSetupForVendorSearch();
+        UpdateSalesSetupForCustomerSearch();
         UpdateProdOrdersTrackInfo();
     end;
 
@@ -258,15 +258,15 @@ codeunit 70124 "COL Install App"
         RRef.Close();
     end;
 
-    internal procedure UpdateSalesSetupForCustomerSearch()
+    internal procedure AddOrderCategoriesOldForSalesOrders()
     var
-        SalesSetup: Record "Sales & Receivables Setup";
+        OrderCategoryOld: Record "COL Order Category (Old)";
+        InitOrderCategoryOld: Codeunit "COL Init Order Category (Old)";
     begin
-        if SalesSetup.Get() then
-            if not SalesSetup."Disable Search by Name" then begin
-                SalesSetup.Validate("Disable Search by Name", true);
-                SalesSetup.Modify(true);
-            end;
+        if not OrderCategoryOld.IsEmpty() then
+            exit;
+
+        InitOrderCategoryOld.InitOrderCategories();
     end;
 
     internal procedure UpdatePurchaseSetupForVendorSearch()
@@ -280,15 +280,15 @@ codeunit 70124 "COL Install App"
             end;
     end;
 
-    internal procedure AddOrderCategoriesOldForSalesOrders()
+    internal procedure UpdateSalesSetupForCustomerSearch()
     var
-        OrderCategoryOld: Record "COL Order Category (Old)";
-        InitOrderCategoryOld: Codeunit "COL Init Order Category (Old)";
+        SalesSetup: Record "Sales & Receivables Setup";
     begin
-        if not OrderCategoryOld.IsEmpty() then
-            exit;
-
-        InitOrderCategoryOld.InitOrderCategories();
+        if SalesSetup.Get() then
+            if not SalesSetup."Disable Search by Name" then begin
+                SalesSetup.Validate("Disable Search by Name", true);
+                SalesSetup.Modify(true);
+            end;
     end;
 
     local procedure UpdateProdOrdersTrackInfo()

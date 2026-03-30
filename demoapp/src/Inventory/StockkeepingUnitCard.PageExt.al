@@ -3,13 +3,13 @@ namespace Weibel.Inventory.Location;
 using Microsoft.Inventory.Location;
 using Microsoft.Manufacturing.ProductionBOM;
 using Weibel.Inventory.BOM;
+using Weibel.Inventory.Setup;
 using Microsoft.Manufacturing.Routing;
 using Microsoft.Inventory.Item.Attribute;
-using Microsoft.Inventory.BOM;
-using Weibel.Inventory.Setup;
-using Microsoft.Inventory.Item;
 using Weibel.Manufacturing.ProductionBOM;
+using Microsoft.Inventory.Item;
 using Weibel.Inventory.Item;
+using Microsoft.Inventory.BOM;
 using Weibel.Inventory.BOM.Tree;
 using Microsoft.Inventory.Setup;
 using Weibel.Manufacturing.Reports;
@@ -25,7 +25,6 @@ pageextension 70122 "COL Stockkeeping Unit Card" extends "Stockkeeping Unit Card
                 ShowRohs();
             end;
         }
-
         addafter(Description)
         {
             field("COL Description 2"; Rec."Description 2")
@@ -53,7 +52,6 @@ pageextension 70122 "COL Stockkeeping Unit Card" extends "Stockkeeping Unit Card
                 ApplicationArea = All;
                 Caption = 'EU REACH Regulation Compliant';
                 ToolTip = 'Specifies the value of the EU REACH Regulation Compliant field.';
-
                 trigger OnValidate()
                 begin
                     Rec.UpdateROHS(EURoHSStatus, EURoHSDirCompliant, EUREACHRegCompliant, Rec.FieldNo("COL EU REACH Reg. Compliant"));
@@ -74,7 +72,6 @@ pageextension 70122 "COL Stockkeeping Unit Card" extends "Stockkeeping Unit Card
                 ApplicationArea = All;
                 Caption = 'EU RoHS Status';
                 ToolTip = 'Specifies the value of the EU RoHS Status field.';
-
                 trigger OnValidate()
                 begin
                     Rec.UpdateROHS(EURoHSStatus, EURoHSDirCompliant, EUREACHRegCompliant, Rec.FieldNo("COL EU RoHS Status"));
@@ -308,22 +305,6 @@ pageextension 70122 "COL Stockkeeping Unit Card" extends "Stockkeeping Unit Card
                         SKUCompareList.RunModal();
                     end;
                 }
-                action("COL Calc Unit Cost")
-                {
-                    Caption = 'Calc. Unit Cost';
-                    ToolTip = 'Calculate Unit Cost for selected SKU and Item.';
-                    Image = Calculate;
-                    ApplicationArea = All;
-
-                    trigger OnAction()
-                    var
-                        CalcSKUUnitCost: Codeunit "COL Calc. SKU Unit Cost";
-                        uc: Decimal;
-                    begin
-                        uc := CalcSKUUnitCost.CalculateSkuUnitCost(Rec, true);
-                        CalcSKUUnitCost.UpdateSKU(Rec, uc, true);
-                    end;
-                }
             }
         }
         addlast("&SKU")
@@ -361,17 +342,10 @@ pageextension 70122 "COL Stockkeeping Unit Card" extends "Stockkeeping Unit Card
             actionref("COL Show Routing_Promoted"; "COL Show Routing") { }
             actionref("COL Show Production BOM_Promoted"; "COL Show Production BOM") { }
             actionref("COL Where-Used_Promoted"; "COL Where-Used") { }
-            actionref("COL Calc Unit Cost_Promoted"; "COL Calc Unit Cost") { }
             actionref("COL Create BOM and Routing_Promoted"; "COL Create BOM and Routing") { }
-            actionref("COL ImportBOMLine_Promoted"; "COL ImportBOMLine") { }
         }
 
     }
-    var
-        EURoHSStatus: Text[20];
-        EURoHSDirCompliant: Enum "COL EU RoHS Dir. Compliant";
-        EUREACHRegCompliant: Enum "COL EU REACH Reg. Compliant";
-        CurrDefault: Boolean;
 
     trigger OnAfterGetCurrRecord()
     begin
@@ -386,6 +360,12 @@ pageextension 70122 "COL Stockkeeping Unit Card" extends "Stockkeeping Unit Card
         if InventorySetup.Get() then
             CurrDefault := InventorySetup."COL SKU Prevent Negative Inv.";
     end;
+
+    var
+        EURoHSStatus: Text[20];
+        EURoHSDirCompliant: Enum "COL EU RoHS Dir. Compliant";
+        EUREACHRegCompliant: Enum "COL EU REACH Reg. Compliant";
+        CurrDefault: Boolean;
 
     local procedure ShowRohs()
     begin

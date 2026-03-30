@@ -3,7 +3,6 @@ page 70237 "COL SKU Replenishment FactBox"
     Caption = 'SKU Details - Replenishment';
     PageType = CardPart;
     SourceTable = "Stockkeeping Unit";
-
     layout
     {
         area(content)
@@ -13,7 +12,6 @@ page 70237 "COL SKU Replenishment FactBox"
                 ApplicationArea = Planning;
                 Caption = 'SKU No.';
                 ToolTip = 'Specifies the number of the item.';
-
                 trigger OnDrillDown()
                 begin
                     ShowDetails();
@@ -32,7 +30,6 @@ page 70237 "COL SKU Replenishment FactBox"
                     ApplicationArea = Planning;
                     Lookup = false;
                     ToolTip = 'Specifies the code of the vendor from whom this item is supplied by default.';
-
                     trigger OnDrillDown()
                     var
                         Vendor: Record Vendor;
@@ -47,19 +44,11 @@ page 70237 "COL SKU Replenishment FactBox"
                 {
                     ApplicationArea = Planning;
                     Lookup = false;
-                    Visible = false;
                     ToolTip = 'Specifies the number that the vendor uses for this item.';
-                }
-                field("COL Item Reference"; Rec."COL Item Reference")
-                {
-                    Caption = 'Vendor Reference';
-                    ApplicationArea = Planning;
-                    Lookup = false;
                 }
             }
         }
     }
-
     local procedure ShowDetails()
     begin
         Page.Run(Page::"Stockkeeping Unit Card", Rec);

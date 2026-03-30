@@ -1,7 +1,6 @@
 namespace Weibel.Service.Document;
 
 using Microsoft.Service.Document;
-
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.SyncEngine;
 using Microsoft.Sales.Document;

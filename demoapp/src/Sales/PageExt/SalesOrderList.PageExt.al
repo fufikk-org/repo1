@@ -2,7 +2,10 @@ namespace Weibel.Sales.Document;
 
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Setup;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Integration.SyncEngine;
 using System.Environment.Configuration;
+using System.Threading;
 using System.Utilities;
 
 pageextension 70153 "COL Sales Order List" extends "Sales Order List"
@@ -64,7 +67,7 @@ pageextension 70153 "COL Sales Order List" extends "Sales Order List"
             {
                 ApplicationArea = All;
             }
-            field("COL Sales Resp. Group"; Rec."COL Sales Resp. Group")
+            field("COL Responsibility Group"; Rec."COL Responsibility Group")
             {
                 ApplicationArea = All;
             }

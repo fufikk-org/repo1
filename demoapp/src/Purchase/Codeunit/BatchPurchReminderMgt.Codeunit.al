@@ -58,7 +58,7 @@ codeunit 70170 "COL Batch Purch. Reminder Mgt."
         JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
         JobQueueEntry."Object ID to Run" := CODEUNIT::"COL Purch. Reminder Mgt.";
         JobQueueEntry."Job Queue Category Code" := GetMailingJobCategory();
-        JobQueueEntry."Maximum No. of Attempts to Run" := 0; // So that the job runs only once        
+        JobQueueEntry."Maximum No. of Attempts to Run" := 0; // So that the job runs only once
         JobQueueEntry."Parameter String" := CopyStr(StrsubstNo('%1:%2', PurchaseHeader.GetFilter("Buy-from Vendor No."), PurchaseHeader.GetFilter("Location Filter")), 1, MaxStrLen(JobQueueEntry."Parameter String"));
         JobQueueEntry.Description := CopyStr(Description, 1, MaxStrLen(JobQueueEntry.Description));
         Codeunit.Run(Codeunit::"Job Queue - Enqueue", JobQueueEntry);

@@ -5,7 +5,6 @@ using Microsoft.Inventory.Costing;
 using Microsoft.Inventory.Item;
 using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Inventory.Location;
-using Weibel.Inventory.Item;
 
 codeunit 70183 "COL SKU Where-Used Management"
 {
@@ -28,10 +27,10 @@ codeunit 70183 "COL SKU Where-Used Management"
 
     procedure FindRecord(Which: Text; var WhereUsedList2: Record "Where-Used Line"): Boolean
     begin
-        this.TempWhereUsedList.Copy(WhereUsedList2);
-        if not this.TempWhereUsedList.Find(Which) then
+        TempWhereUsedList.Copy(WhereUsedList2);
+        if not TempWhereUsedList.Find(Which) then
             exit(false);
-        WhereUsedList2 := this.TempWhereUsedList;
+        WhereUsedList2 := TempWhereUsedList;
 
         exit(true);
     end;
@@ -40,17 +39,17 @@ codeunit 70183 "COL SKU Where-Used Management"
     var
         CurrentSteps: Integer;
     begin
-        this.TempWhereUsedList.Copy(WhereUsedList2);
-        CurrentSteps := this.TempWhereUsedList.Next(Steps);
+        TempWhereUsedList.Copy(WhereUsedList2);
+        CurrentSteps := TempWhereUsedList.Next(Steps);
         if CurrentSteps <> 0 then
-            WhereUsedList2 := this.TempWhereUsedList;
+            WhereUsedList2 := TempWhereUsedList;
 
         exit(CurrentSteps);
     end;
 
     procedure WhereUsedFromSku(Sku: Record "Stockkeeping Unit"; CalcDate: Date; NewMultiLevel: Boolean)
     begin
-        this.BuildWhereUsedListWithCheck(Enum::"Production BOM Line Type"::Item, Sku, CalcDate, NewMultiLevel);
+        BuildWhereUsedListWithCheck(Enum::"Production BOM Line Type"::Item, Sku, CalcDate, NewMultiLevel);
     end;
 
     local procedure BuildWhereUsedListWithCheck(BOMLineType: Enum "Production BOM Line Type"; var Sku: Record "Stockkeeping Unit"; CalcDate: Date; IsMultiLevel: Boolean)
@@ -60,181 +59,100 @@ codeunit 70183 "COL SKU Where-Used Management"
     begin
         ProdBOMToCheck := Sku."Production BOM No.";
 
-        ProdBOMCheck.CheckBOM(ProdBOMToCheck, this.VersionMgt.GetBOMVersion(ProdBOMToCheck, CalcDate, false));
+        ProdBOMCheck.CheckBOM(ProdBOMToCheck, VersionMgt.GetBOMVersion(ProdBOMToCheck, CalcDate, false));
 
-        this.TempWhereUsedList.DeleteAll();
-        this.NextWhereUsedEntryNo := 1;
-        this.MultiLevel := IsMultiLevel;
+        TempWhereUsedList.DeleteAll();
+        NextWhereUsedEntryNo := 1;
+        MultiLevel := IsMultiLevel;
 
-        this.BuildWhereUsedList(BOMLineType, Sku."Item No.", Sku."Variant Code", CalcDate, 1, 1);
+        BuildWhereUsedList(BOMLineType, Sku."Item No.", Sku."Variant Code", CalcDate, 1, 1);
     end;
 
     local procedure BuildWhereUsedList(Type: Enum "Production BOM Line Type"; No: Code[20]; VariantCode: Code[20]; CalcDate: Date; Level: Integer; Quantity: Decimal)
+    var
+        ItemAssembly: Record Item;
+        SkuAssembly: Record "Stockkeeping Unit";
+        SkuAssembly2: Record "Stockkeeping Unit";
+        ProdBOMComponent: Record "Production BOM Line";
     begin
         if Level > 30 then
             exit;
 
-        if Type = Type::"Production BOM" then
-            this.AddWhereUsedLinesForProductionBOM(No, CalcDate, Level, Quantity);
+        if Type = Type::"Production BOM" then begin
+            SkuAssembly.SetCurrentKey("Production BOM No.");
+            SkuAssembly.SetRange("Production BOM No.", No);
+            SkuAssembly.SetAutoCalcFields(Description);
+            if SkuAssembly.FindSet() then
+                repeat
 
-        if Type = Type::Item then
-            this.AddWhereUsedLinesForPhantomBOMs(No, VariantCode, CalcDate);
+                    TempWhereUsedList.Init();
+                    TempWhereUsedList."Entry No." := NextWhereUsedEntryNo;
+                    TempWhereUsedList."Item No." := SkuAssembly."Item No.";
+                    TempWhereUsedList.Description := SkuAssembly.Description;
+                    TempWhereUsedList."Level Code" := Level;
 
-        this.TraverseParentBOMComponents(Type, No, VariantCode, CalcDate, Level, Quantity);
+                    // if TempWhereUsedList."Level Code" <= 2 then begin
+                    TempWhereUsedList."COL No." := SkuAssembly."Production BOM No.";
+                    TempWhereUsedList."COL Type" := "Production BOM Line Type"::Item;
+                    // end
+                    // else begin
+                    //     TempWhereUsedList."COL No." := No;
+                    //     TempWhereUsedList."COL Type" := "Production BOM Line Type"::"Production BOM";
+                    // end;
 
-        this.OnAfterBuildWhereUsedList(Type.AsInteger(), No, CalcDate, this.TempWhereUsedList, this.NextWhereUsedEntryNo, Level, Quantity, this.MultiLevel);
-    end;
+                    ItemAssembly.Get(SkuAssembly."Item No.");
+                    TempWhereUsedList."Quantity Needed" :=
+                      Quantity *
+                      (1 + SkuAssembly."Scrap %" / 100) *
+                      UOMMgt.GetQtyPerUnitOfMeasure(ItemAssembly, ItemAssembly."Base Unit of Measure") /
+                      UOMMgt.GetQtyPerUnitOfMeasure(
+                        ItemAssembly,
+                        VersionMgt.GetBOMUnitOfMeasure(
+                          SkuAssembly."Production BOM No.",
+                          VersionMgt.GetBOMVersion(SkuAssembly."Production BOM No.", CalcDate, false)));
+                    TempWhereUsedList."Version Code" := VersionMgt.GetBOMVersion(No, CalcDate, true);
+                    TempWhereUsedList.Insert();
+                    NextWhereUsedEntryNo := NextWhereUsedEntryNo + 1;
+                    if MultiLevel then
+                        BuildWhereUsedList(
+                          Enum::"Production BOM Line Type"::Item,
+                          SkuAssembly."Item No.",
+                          SkuAssembly."Variant Code",
+                          CalcDate,
+                          Level + 1,
+                          TempWhereUsedList."Quantity Needed");
+                until SkuAssembly.Next() = 0;
+        end;
 
-    local procedure AddWhereUsedLinesForProductionBOM(ProdBOMNo: Code[20]; CalcDate: Date; Level: Integer; Quantity: Decimal)
-    var
-        SkuAssembly: Record "Stockkeeping Unit";
-    begin
-        SkuAssembly.SetCurrentKey("Production BOM No.");
-        SkuAssembly.SetRange("Production BOM No.", ProdBOMNo);
-        SkuAssembly.SetAutoCalcFields(Description);
-        if SkuAssembly.FindSet() then
-            repeat
-                this.InsertItemWhereUsedLine(SkuAssembly, ProdBOMNo, CalcDate, Level, Quantity);
-                if this.MultiLevel then
-                    this.BuildWhereUsedList(
-                      Enum::"Production BOM Line Type"::Item,
-                      SkuAssembly."Item No.",
-                      SkuAssembly."Variant Code",
-                      CalcDate,
-                      Level + 1,
-                      this.TempWhereUsedList."Quantity Needed");
-            until SkuAssembly.Next() = 0
-        else
-            this.InsertPhantomBOMWhereUsedLine(ProdBOMNo, CalcDate, Level, Quantity);
-    end;
+        if Type = Type::Item then begin // Add phantom BOM
 
-    local procedure InsertItemWhereUsedLine(SkuAssembly: Record "Stockkeeping Unit"; ProdBOMNo: Code[20]; CalcDate: Date; Level: Integer; Quantity: Decimal)
-    var
-        ItemAssembly: Record Item;
-        ItemVariant: Record "Item Variant";
-    begin
-        this.TempWhereUsedList.Init();
-        this.TempWhereUsedList."Entry No." := this.NextWhereUsedEntryNo;
-        this.TempWhereUsedList."Item No." := SkuAssembly."Item No.";
-        this.TempWhereUsedList.Description := SkuAssembly.Description;
-        this.TempWhereUsedList."Level Code" := Level;
-        this.TempWhereUsedList."COL No." := SkuAssembly."Production BOM No.";
-        this.TempWhereUsedList."COL Type" := "Production BOM Line Type"::Item;
-        this.TempWhereUsedList."COL Related SKU Item No." := SkuAssembly."Item No.";
-        this.TempWhereUsedList."COL Related SKU Variant Code" := SkuAssembly."Variant Code";
-        this.TempWhereUsedList."COL Related SKU Location Code" := SkuAssembly."Location Code";
-        if ItemVariant.Get(SkuAssembly."Item No.", SkuAssembly."Variant Code") then
-            this.TempWhereUsedList."COL Product Life Cycle" := ItemVariant."COL Product Life Cycle";
+            SkuAssembly2.SetRange("Item No.", No);
+            SkuAssembly2.SetRange("Variant Code", VariantCode);
+            if SkuAssembly2.FindSet() then
+                repeat
 
-        ItemAssembly.Get(SkuAssembly."Item No.");
-        this.TempWhereUsedList."Quantity Needed" :=
-          Quantity *
-          (1 + SkuAssembly."Scrap %" / 100) *
-          this.UOMMgt.GetQtyPerUnitOfMeasure(ItemAssembly, ItemAssembly."Base Unit of Measure") /
-          this.UOMMgt.GetQtyPerUnitOfMeasure(
-            ItemAssembly,
-            this.VersionMgt.GetBOMUnitOfMeasure(
-              SkuAssembly."Production BOM No.",
-              this.VersionMgt.GetBOMVersion(SkuAssembly."Production BOM No.", CalcDate, false)));
-        this.TempWhereUsedList."Version Code" := this.VersionMgt.GetBOMVersion(ProdBOMNo, CalcDate, true);
-        this.TempWhereUsedList.Insert();
-        this.NextWhereUsedEntryNo := this.NextWhereUsedEntryNo + 1;
-    end;
+                    ProdBOMComponent.Reset();
+                    ProdBOMComponent.SetCurrentKey(Type, "No.");
+                    ProdBOMComponent.SetRange(Type, Type::"Production BOM");
+                    ProdBOMComponent.SetRange("No.", SkuAssembly2."Production BOM No.");
+                    if CalcDate <> 0D then begin
+                        ProdBOMComponent.SetFilter("Starting Date", '%1|..%2', 0D, CalcDate);
+                        ProdBOMComponent.SetFilter("Ending Date", '%1|%2..', 0D, CalcDate);
+                    end;
 
-    local procedure InsertPhantomBOMWhereUsedLine(ProdBOMNo: Code[20]; CalcDate: Date; Level: Integer; Quantity: Decimal)
-    var
-        ProdBOMHeader: Record "Production BOM Header";
-    begin
-        ProdBOMHeader.Get(ProdBOMNo);
-        this.TempWhereUsedList.Init();
-        this.TempWhereUsedList."Entry No." := this.NextWhereUsedEntryNo;
-        this.TempWhereUsedList.Description := ProdBOMHeader.Description;
-        this.TempWhereUsedList."Level Code" := Level;
-        this.TempWhereUsedList."COL No." := ProdBOMNo;
-        this.TempWhereUsedList."COL Type" := "Production BOM Line Type"::"Production BOM";
-        this.TempWhereUsedList."Version Code" := this.VersionMgt.GetBOMVersion(ProdBOMNo, CalcDate, true);
-        this.TempWhereUsedList."Quantity Needed" := Quantity;
-        this.TempWhereUsedList.Insert();
-        this.NextWhereUsedEntryNo := this.NextWhereUsedEntryNo + 1;
-    end;
+                    if ProdBOMComponent.FindSet() then
+                        repeat
+                            if VersionMgt.GetBOMVersion(
+                                 ProdBOMComponent."Production BOM No.", CalcDate, true) =
+                               ProdBOMComponent."Version Code"
+                            then
+                                AddPhantomBom(ProdBOMComponent, CalcDate);
 
-    local procedure AddWhereUsedLinesForPhantomBOMs(ItemNo: Code[20]; VariantCode: Code[20]; CalcDate: Date)
-    var
-        SkuAssembly: Record "Stockkeeping Unit";
-        ProdBOMComponent: Record "Production BOM Line";
-    begin
-        SkuAssembly.SetRange("Item No.", ItemNo);
-        SkuAssembly.SetRange("Variant Code", VariantCode);
-        if SkuAssembly.FindSet() then
-            repeat
-                ProdBOMComponent.Reset();
-                ProdBOMComponent.SetCurrentKey(Type, "No.");
-                ProdBOMComponent.SetRange(Type, ProdBOMComponent.Type::"Production BOM");
-                ProdBOMComponent.SetRange("No.", SkuAssembly."Production BOM No.");
-                if CalcDate <> 0D then begin
-                    ProdBOMComponent.SetFilter("Starting Date", '%1|..%2', 0D, CalcDate);
-                    ProdBOMComponent.SetFilter("Ending Date", '%1|%2..', 0D, CalcDate);
-                end;
+                        until ProdBOMComponent.Next() = 0;
 
-                if ProdBOMComponent.FindSet() then
-                    repeat
-                        if this.VersionMgt.GetBOMVersion(
-                             ProdBOMComponent."Production BOM No.", CalcDate, true) =
-                           ProdBOMComponent."Version Code"
-                        then
-                            this.InsertPhantomBomLine(ProdBOMComponent, CalcDate);
-                    until ProdBOMComponent.Next() = 0;
-            until SkuAssembly.Next() = 0;
-    end;
+                until SkuAssembly2.Next() = 0;
+        end;
 
-    local procedure InsertPhantomBomLine(var ProdBOMComponent: Record "Production BOM Line"; CalcDate: Date)
-    var
-        SkuAssembly: Record "Stockkeeping Unit";
-        ItemAssembly: Record Item;
-        ItemVariant: Record "Item Variant";
-        Quantity: Decimal;
-    begin
-        if ProdBOMComponent."No." = '' then
-            exit;
-
-        SkuAssembly.SetCurrentKey("Production BOM No.");
-        SkuAssembly.SetRange("Production BOM No.", ProdBOMComponent."Production BOM No.");
-        SkuAssembly.SetAutoCalcFields(Description);
-        if SkuAssembly.FindSet() then
-            repeat
-                Quantity := this.MfgCostCalcMgt.CalcCompItemQtyBase(ProdBOMComponent, CalcDate, 1, '', false);
-
-                this.TempWhereUsedList.Init();
-                this.TempWhereUsedList."Entry No." := this.NextWhereUsedEntryNo;
-                this.TempWhereUsedList."Level Code" := 0;
-                this.TempWhereUsedList."COL No." := SkuAssembly."Production BOM No.";
-                this.TempWhereUsedList."COL Type" := "Production BOM Line Type"::"Production BOM";
-                this.TempWhereUsedList."COL Related SKU Item No." := SkuAssembly."Item No.";
-                this.TempWhereUsedList."COL Related SKU Variant Code" := SkuAssembly."Variant Code";
-                this.TempWhereUsedList."COL Related SKU Location Code" := SkuAssembly."Location Code";
-                if ItemVariant.Get(SkuAssembly."Item No.", SkuAssembly."Variant Code") then
-                    this.TempWhereUsedList."COL Product Life Cycle" := ItemVariant."COL Product Life Cycle";
-
-                ItemAssembly.Get(SkuAssembly."Item No.");
-                this.TempWhereUsedList."Quantity Needed" :=
-                  Quantity *
-                  (1 + SkuAssembly."Scrap %" / 100) *
-                  this.UOMMgt.GetQtyPerUnitOfMeasure(ItemAssembly, ItemAssembly."Base Unit of Measure") /
-                  this.UOMMgt.GetQtyPerUnitOfMeasure(
-                    ItemAssembly,
-                    this.VersionMgt.GetBOMUnitOfMeasure(
-                      SkuAssembly."Production BOM No.",
-                      this.VersionMgt.GetBOMVersion(SkuAssembly."Production BOM No.", CalcDate, false)));
-                this.TempWhereUsedList."Version Code" := this.VersionMgt.GetBOMVersion(ProdBOMComponent."No.", CalcDate, true);
-                this.TempWhereUsedList.Insert();
-                this.NextWhereUsedEntryNo := this.NextWhereUsedEntryNo + 1;
-            until SkuAssembly.Next() = 0;
-    end;
-
-    local procedure TraverseParentBOMComponents(Type: Enum "Production BOM Line Type"; No: Code[20]; VariantCode: Code[20]; CalcDate: Date; Level: Integer; Quantity: Decimal)
-    var
-        ProdBOMComponent: Record "Production BOM Line";
-    begin
         ProdBOMComponent.Reset();
         ProdBOMComponent.SetCurrentKey(Type, "No.");
         ProdBOMComponent.SetRange(Type, Type);
@@ -246,23 +164,68 @@ codeunit 70183 "COL SKU Where-Used Management"
 
         if ProdBOMComponent.FindSet() then
             repeat
-                if this.VersionMgt.GetBOMVersion(
+                if VersionMgt.GetBOMVersion(
                      ProdBOMComponent."Production BOM No.", CalcDate, true) =
                    ProdBOMComponent."Version Code"
                 then begin
-                    this.OnBuildWhereUsedListOnLoopProdBomComponent(ProdBOMComponent, this.TempWhereUsedList, this.NextWhereUsedEntryNo, No, CalcDate, Level);
-                    if this.IsActiveProductionBOM(ProdBOMComponent, VariantCode) then begin
-                        this.TempLastProdBOMComponent.TransferFields(ProdBOMComponent);
-                        this.BuildWhereUsedList(
+                    OnBuildWhereUsedListOnLoopProdBomComponent(ProdBOMComponent, TempWhereUsedList, NextWhereUsedEntryNo, No, CalcDate, Level);
+                    if IsActiveProductionBOM(ProdBOMComponent, VariantCode) then begin
+                        TempLastProdBOMComponent.TransferFields(ProdBOMComponent);
+                        BuildWhereUsedList(
                             Enum::"Production BOM Line Type"::"Production BOM",
                             ProdBOMComponent."Production BOM No.",
                             VariantCode,
                             CalcDate,
                             Level + 1,
-                            this.MfgCostCalcMgt.CalcCompItemQtyBase(ProdBOMComponent, CalcDate, Quantity, '', false));
+                            MfgCostCalcMgt.CalcCompItemQtyBase(ProdBOMComponent, CalcDate, Quantity, '', false));
                     end;
                 end;
             until ProdBOMComponent.Next() = 0;
+
+        OnAfterBuildWhereUsedList(Type.AsInteger(), No, CalcDate, TempWhereUsedList, NextWhereUsedEntryNo, Level, Quantity, MultiLevel);
+    end;
+
+    local procedure AddPhantomBom(var ProdBOMComponent: Record "Production BOM Line"; CalcDate: Date)
+    var
+        SkuAssembly: Record "Stockkeeping Unit";
+        ItemAssembly: Record Item;
+        Quantity: Decimal;
+    begin
+        if ProdBOMComponent."No." = '' then
+            exit;
+
+        SkuAssembly.SetCurrentKey("Production BOM No.");
+        SkuAssembly.SetRange("Production BOM No.", ProdBOMComponent."Production BOM No.");
+        SkuAssembly.SetAutoCalcFields(Description);
+        if SkuAssembly.FindSet() then
+            repeat
+
+                Quantity := MfgCostCalcMgt.CalcCompItemQtyBase(ProdBOMComponent, CalcDate, 1, '', false);
+
+                TempWhereUsedList.Init();
+                TempWhereUsedList."Entry No." := NextWhereUsedEntryNo;
+                TempWhereUsedList."Item No." := SkuAssembly."Item No.";
+                TempWhereUsedList.Description := SkuAssembly.Description;
+                TempWhereUsedList."Level Code" := 0;
+
+                TempWhereUsedList."COL No." := SkuAssembly."Production BOM No.";
+                TempWhereUsedList."COL Type" := "Production BOM Line Type"::"Production BOM";
+
+
+                ItemAssembly.Get(SkuAssembly."Item No.");
+                TempWhereUsedList."Quantity Needed" :=
+                  Quantity *
+                  (1 + SkuAssembly."Scrap %" / 100) *
+                  UOMMgt.GetQtyPerUnitOfMeasure(ItemAssembly, ItemAssembly."Base Unit of Measure") /
+                  UOMMgt.GetQtyPerUnitOfMeasure(
+                    ItemAssembly,
+                    VersionMgt.GetBOMUnitOfMeasure(
+                      SkuAssembly."Production BOM No.",
+                      VersionMgt.GetBOMVersion(SkuAssembly."Production BOM No.", CalcDate, false)));
+                TempWhereUsedList."Version Code" := VersionMgt.GetBOMVersion(ProdBOMComponent."No.", CalcDate, true);
+                TempWhereUsedList.Insert();
+                NextWhereUsedEntryNo := NextWhereUsedEntryNo + 1;
+            until SkuAssembly.Next() = 0;
     end;
 
     procedure IsActiveProductionBOM(ProductionBOMLine: Record "Production BOM Line"; VariantCode: Code[20]) Result: Boolean
@@ -271,9 +234,9 @@ codeunit 70183 "COL SKU Where-Used Management"
             exit(false);
 
         if ProductionBOMLine."Version Code" = '' then
-            exit(not this.IsProductionBOMClosed(ProductionBOMLine));
+            exit(not IsProductionBOMClosed(ProductionBOMLine));
 
-        exit(not this.IsProdBOMVersionClosed(ProductionBOMLine));
+        exit(not IsProdBOMVersionClosed(ProductionBOMLine));
     end;
 
     local procedure IsProductionBOMClosed(ProductionBOMLine: Record "Production BOM Line"): Boolean

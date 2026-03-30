@@ -3,8 +3,6 @@ namespace Weibel.API;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Inventory.Item;
 using Weibel.Inventory.Item;
-using Weibel.Foundation.Navigate;
-using Microsoft.Foundation.Navigate;
 
 page 70186 "COL Prod Order Lines API"
 {
@@ -250,16 +248,6 @@ page 70186 "COL Prod Order Lines API"
                 field(systemModifiedAt; Rec."SystemModifiedAt") { }
 
                 field(systemModifiedBy; Rec."SystemModifiedBy") { }
-
-                part("COL_OrderTrackings"; "COL Order Tracking Entry")
-                {
-                    ApplicationArea = All;
-                    Caption = 'OrderTrackings';
-                    EntityName = 'colOrderTracking';
-                    EntitySetName = 'colOrderTrackings';
-                    Editable = false;
-                    SubPageLink = "COL Source Line Id" = field(SystemId);
-                }
             }
         }
     }
@@ -274,7 +262,5 @@ page 70186 "COL Prod Order Lines API"
         plcValue := Format(ItemVariant."COL Product Life Cycle"::"Not Relevant");
         if ItemVariant.Get(Rec."Item No.", Rec."Variant Code") then
             plcValue := Format(ItemVariant."COL Product Life Cycle");
-
-
     end;
 }

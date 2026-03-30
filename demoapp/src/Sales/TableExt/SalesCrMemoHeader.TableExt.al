@@ -1,5 +1,5 @@
 namespace Weibel.Sales.History;
-using Weibel.Foundation.SalesResponsibilityGroup;
+
 using Microsoft.Sales.History;
 using Weibel.Common;
 using Microsoft.Sales.Customer;
@@ -7,7 +7,6 @@ using Microsoft.Foundation.Address;
 using Weibel.Foundation.FinanceCategory;
 using Weibel.Foundation.SalesOrderCategory;
 using System.Environment;
-using Microsoft.CRM.Team;
 
 tableextension 70121 "COL Sales Cr.Memo Header" extends "Sales Cr.Memo Header"
 {
@@ -193,28 +192,6 @@ tableextension 70121 "COL Sales Cr.Memo Header" extends "Sales Cr.Memo Header"
             Caption = 'Project Name';
             DataClassification = CustomerContent;
             ToolTip = 'Specifies project name.';
-        }
-        field(70151; "COL Sales Resp. Group"; Code[20])
-        {
-            Caption = 'Sales Responsibility Group';
-            DataClassification = CustomerContent;
-            ToolTip = 'Specifies the sales responsibility group for the sales document.';
-            TableRelation = "COL Sales Resp. Group";
-            ValidateTableRelation = false;
-        }
-        field(70152; "COL Order No."; Code[20])
-        {
-            Caption = 'Order No.';
-            DataClassification = CustomerContent;
-            ToolTip = 'Specifies the order number for the sales document.';
-        }
-        field(70154; "COL GS. Salesperson Code"; Code[20])
-        {
-            Caption = 'Salesperson Code';
-            ToolTip = 'Specifies the salesperson code.';
-            DataClassification = CustomerContent;
-            TableRelation = "Salesperson/Purchaser" where(Blocked = const(false));
-            ValidateTableRelation = false;
         }
     }
 

@@ -5,7 +5,6 @@ using Weibel.Common;
 using Microsoft.Sales.Customer;
 using Microsoft.Foundation.Address;
 using Weibel.Inventory.Item;
-using Microsoft.CRM.Team;
 
 tableextension 70118 "COL Service Invoice Header" extends "Service Invoice Header"
 {
@@ -183,14 +182,6 @@ tableextension 70118 "COL Service Invoice Header" extends "Service Invoice Heade
             Caption = 'Customer No.';
             ToolTip = 'Specifies the Customer No.';
             DataClassification = CustomerContent;
-        }
-        field(70134; "COL GS. Salesperson Code"; Code[20])
-        {
-            Caption = 'Salesperson Code';
-            ToolTip = 'Specifies the salesperson code.';
-            DataClassification = CustomerContent;
-            TableRelation = "Salesperson/Purchaser" where(Blocked = const(false));
-            ValidateTableRelation = false;
         }
     }
 

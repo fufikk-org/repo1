@@ -30,14 +30,6 @@ reportextension 70103 "COL Create Pick" extends "Create Pick"
     {
         layout
         {
-            modify(PrintPick)
-            {
-                trigger OnAfterValidate()
-                begin
-                    if PrintPick then
-                        COLPrintWarPick := false;
-                end;
-            }
             addafter(PrintPick)
             {
                 field("COL Work Center Code"; COLWorkCenterCode)
@@ -53,18 +45,6 @@ reportextension 70103 "COL Create Pick" extends "Create Pick"
                     ToolTip = 'Specifies the Routing Link Code to be used for the document creation.';
                     TableRelation = "Routing Link";
                     ApplicationArea = All;
-                }
-                field("COL PrintWarPick"; COLPrintWarPick)
-                {
-                    Caption = 'Print Warehouse Pick';
-                    ToolTip = 'Print Warehouse Pick for all documents.';
-                    ApplicationArea = All;
-
-                    trigger OnValidate()
-                    begin
-                        if COLPrintWarPick then
-                            PrintPick := false;
-                    end;
                 }
             }
             addafter(PerZone)
@@ -100,41 +80,15 @@ reportextension 70103 "COL Create Pick" extends "Create Pick"
         begin
             Clear(COLRoutingLinkCode);
             COLOnAfterOpenRequestPage();
-
         end;
     }
 
-    trigger OnPreReport()
-    begin
-        COLStaticCreatePicSM.InitCreatePick(UserId());
-    end;
-
-    trigger OnPostReport()
-    var
-        filterVal: Text;
-    begin
-        if COLPrintWarPick then begin
-            filterVal := COLStaticCreatePicSM.GetPickToPrintFilter(UserId());
-            PrintPickWarehouse(filterVal);
-        end;
-    end;
-
     protected var
         COLCreatePickHandler: Codeunit "COL Create Pick Handler";
-        COLStaticCreatePicSM: Codeunit "COL Create Pic SM";
         COLPickZoneCodeFilter: Code[20];
         COLLocationCode: Code[10];
         COLRoutingLinkCode: Text;
         COLWorkCenterCode: Text[250];
-        COLPrintWarPick: Boolean;
-
-    local procedure PrintPickWarehouse(FilterTxt: Text)
-    begin
-        if FilterTxt = '' then
-            exit;
-
-        COLStaticCreatePicSM.PrintPickWarehouse(FilterTxt);
-    end;
 
     local procedure SetPickWhseWkshLineCustomFilter()
     begin
@@ -153,15 +107,15 @@ reportextension 70103 "COL Create Pick" extends "Create Pick"
     local procedure SetWorkCenterFilterField()
     var
         WhseWorksheetLine: Record "Whse. Worksheet Line";
-        ProductionLine: Record "Prod. Order Line";
+        ProductionOrder: Record "Production Order";
         RecordMatch: Boolean;
     begin
         WhseWorksheetLine.SetRange("Whse. Document Type", WhseWorksheetLine."Whse. Document Type"::Production);
         WhseWorksheetLine.SetRange("Source Document", WhseWorksheetLine."Source Document"::"Prod. Consumption");
         if WhseWorksheetLine.FindSet() then
             repeat
-                ProductionLine.Get(ProductionLine.Status::Released, WhseWorksheetLine."Whse. Document No.", WhseWorksheetLine."Whse. Document Line No.");
-                RecordMatch := COLCreatePickHandler.CheckProdRoutCodes(COLWorkCenterCode, ProductionLine);
+                ProductionOrder.Get(ProductionOrder.Status::Released, WhseWorksheetLine."Whse. Document No.");
+                RecordMatch := COLCreatePickHandler.CheckRoutCodes(COLWorkCenterCode, WhseWorksheetLine."COL Routing Link Code", ProductionOrder."Routing No.");
                 WhseWorksheetLine."COL Valid Work Center" := RecordMatch;
                 WhseWorksheetLine.Modify();
             until WhseWorksheetLine.Next() = 0;

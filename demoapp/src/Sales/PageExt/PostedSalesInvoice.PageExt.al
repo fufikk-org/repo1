@@ -49,20 +49,7 @@ pageextension 70132 "COL Posted Sales Invoice" extends "Posted Sales Invoice"
             group("COL Weibel")
             {
                 Caption = 'Weibel';
-                field("COL Sales Order Category"; Rec."COL Sales Order Category")
-                {
-                    ApplicationArea = All;
-                }
-                field("COL Sales Finance Category"; Rec."COL Sales Finance Category")
-                {
-                    ApplicationArea = All;
-                }
                 field("COL Project Name"; Rec."COL Project Name")
-                {
-                    ApplicationArea = All;
-                }
-
-                field("COL Sales Resp. Group"; Rec."COL Sales Resp. Group")
                 {
                     ApplicationArea = All;
                 }
@@ -72,6 +59,19 @@ pageextension 70132 "COL Posted Sales Invoice" extends "Posted Sales Invoice"
         addafter("External Document No.")
         {
             field("COL Original Promised Date"; Rec."COL Original Promised Date")
+            {
+                ApplicationArea = All;
+                Editable = false;
+            }
+        }
+
+        addafter("Salesperson Code")
+        {
+            field("COL Sales Finance Category"; Rec."COL Sales Finance Category")
+            {
+                ApplicationArea = All;
+            }
+            field("COL Sales Order Category"; Rec."COL Sales Order Category")
             {
                 ApplicationArea = All;
                 Editable = false;

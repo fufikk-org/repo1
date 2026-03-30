@@ -155,10 +155,6 @@ pageextension 70133 "COL Service Invoice" extends "Service Invoice"
                 {
                     ApplicationArea = Basic, Suite;
                 }
-                field("COL GS. Salesperson Code"; Rec."COL GS. Salesperson Code")
-                {
-                    ApplicationArea = Basic, Suite;
-                }
                 field("COL GS_0"; Rec."COL GS. Name")
                 {
                     ApplicationArea = Basic, Suite;

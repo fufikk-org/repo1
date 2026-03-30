@@ -52,10 +52,6 @@ pageextension 70247 "COL Posted Return Receipt" extends "Posted Return Receipt"
                 {
                     ApplicationArea = Basic, Suite;
                 }
-                field("COL Sales Resp. Group"; Rec."COL Sales Resp. Group")
-                {
-                    ApplicationArea = All;
-                }
             }
         }
     }

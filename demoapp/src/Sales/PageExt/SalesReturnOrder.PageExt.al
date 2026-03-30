@@ -22,10 +22,6 @@ pageextension 70246 "COL Sales Return Order" extends "Sales Return Order"
                 {
                     ApplicationArea = Basic, Suite;
                 }
-                field("COL GS. Salesperson Code"; Rec."COL GS. Salesperson Code")
-                {
-                    ApplicationArea = Basic, Suite;
-                }
                 field("COL GS_0"; Rec."COL GS. Name")
                 {
                     ApplicationArea = Basic, Suite;
@@ -57,11 +53,6 @@ pageextension 70246 "COL Sales Return Order" extends "Sales Return Order"
                 field("COL GS_7"; Rec."COL GS. Country/Region")
                 {
                     ApplicationArea = Basic, Suite;
-                }
-                field("COL Sales Resp. Group"; Rec."COL Sales Resp. Group")
-                {
-                    ApplicationArea = All;
-                    Visible = false;
                 }
             }
         }

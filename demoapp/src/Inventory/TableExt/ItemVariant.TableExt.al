@@ -13,11 +13,7 @@ tableextension 70124 "COL Item Variant" extends "Item Variant"
             trigger OnAfterValidate()
             begin
                 if Rec.Blocked <> xRec.Blocked then
-                    if Rec.Blocked then
-                        LogComment(Rec.FieldName(Blocked), Rec.Blocked)
-                    else
-                        InventoryBlockingMgt.DoUnBlock(Rec);
-
+                    LogComment(Rec.FieldName(Blocked), Rec.Blocked);
             end;
         }
         modify("Sales Blocked")
@@ -44,7 +40,6 @@ tableextension 70124 "COL Item Variant" extends "Item Variant"
                     LogComment(Rec.FieldName("Service Blocked"), Rec."Service Blocked");
             end;
         }
-
         field(70100; "COL Product Life Cycle"; Enum "COL Product Life Cycle")
         {
             Caption = 'Product Life Cycle';
@@ -53,7 +48,6 @@ tableextension 70124 "COL Item Variant" extends "Item Variant"
 
             trigger OnValidate()
             begin
-                InventoryBlockingMgt.CheckPLC(Rec, xRec);
                 UpdateBlockade();
             end;
         }
@@ -115,7 +109,6 @@ tableextension 70124 "COL Item Variant" extends "Item Variant"
             Editable = false;
             CalcFormula = lookup("COL Legacy Item"."NAV Item No." where("Item No." = field("Item No."), "Variant Code" = field(Code)));
         }
-
         field(70110; "COL EU RoHS Dir. Compliant"; Enum "COL EU RoHS Dir. Compliant")
         {
             Caption = 'EU RoHS Directive Compliant';
@@ -134,16 +127,7 @@ tableextension 70124 "COL Item Variant" extends "Item Variant"
             DataClassification = CustomerContent;
             ToolTip = 'Specifies the value of the EU RoHS Status field.';
         }
-        field(70113; "COL Silent Mode"; Boolean) // to not display reason code
-        {
-            Caption = 'Silent Mode';
-            DataClassification = CustomerContent;
-            ToolTip = 'Specifies whether the item variant is in silent mode. Silent mode is used to exclude item variants from being blocked by product life cycle code changes.';
-        }
     }
-
-    var
-        InventoryBlockingMgt: Codeunit "COL Inventory Blocking Mgt.";
 
     local procedure UpdateBlockade()
     var
@@ -164,24 +148,14 @@ tableextension 70124 "COL Item Variant" extends "Item Variant"
 
     local procedure LogComment(FieldName: Text; NewValue: Boolean)
     var
+        ItemVariantComment: Record "COL Item Variant Comment";
         ReasonText: Text[80];
         ValueChangedOutsideUILbl: Label 'Value changed outside UI, no reason provided.';
     begin
-        if Rec."COL Silent Mode" then
-            exit;
-
         if GuiAllowed() then
             ReasonText := GetReasonFromDialog()
         else
             ReasonText := ValueChangedOutsideUILbl;
-
-        COLAddItemVariantComment(FieldName, NewValue, ReasonText);
-    end;
-
-    procedure COLAddItemVariantComment(FieldName: Text; NewValue: Boolean; ReasonText: Text[80]) // to add comment in batch for multiple variants with one reason, the ReasonText is passed in as parameter instead of getting reason from dialog in this procedure
-    var
-        ItemVariantComment: Record "COL Item Variant Comment";
-    begin
         if ReasonText <> '' then begin
             ItemVariantComment.Init();
             ItemVariantComment."Item No." := Rec."Item No.";

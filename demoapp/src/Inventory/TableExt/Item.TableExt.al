@@ -6,8 +6,8 @@ using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Requisition;
 using Weibel.Inventory.LegacyItems;
 using Weibel.Inventory.Planning;
-using Microsoft.Inventory.Availability;
 using Microsoft.Purchases.Setup;
+using Microsoft.Inventory.Availability;
 
 tableextension 70102 "COL Item" extends Item
 {
@@ -262,12 +262,6 @@ tableextension 70102 "COL Item" extends Item
             FieldClass = FlowField;
             CalcFormula = exist("COL Item Attr. Filter Criteria" where("Table ID" = const(Database::Item), "Filter ID" = field("COL Filter Criteria ID"), "Item No." = field("No.")));
             AllowInCustomizations = Never;
-        }
-        field(70503; "COL Silent Mode"; Boolean) // to not display reason code
-        {
-            Caption = 'Silent Mode';
-            DataClassification = CustomerContent;
-            ToolTip = 'Specifies whether the item variant is in silent mode. Silent mode is used to exclude item variants from being blocked by product life cycle code changes.';
         }
     }
 

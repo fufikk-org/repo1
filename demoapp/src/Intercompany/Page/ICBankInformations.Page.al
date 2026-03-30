@@ -5,7 +5,7 @@ using Weibel.Intercompany;
 page 70249 "COL I/C Bank Informations"
 {
     ApplicationArea = All;
-    Caption = 'I/C Bank information';
+    Caption = 'I/C Bank information''s';
     PageType = List;
     SourceTable = "COL I/C Bank Information";
     UsageCategory = Administration;
@@ -26,9 +26,6 @@ page 70249 "COL I/C Bank Informations"
                 {
                 }
                 field("I/C IBAN"; Rec."I/C IBAN")
-                {
-                }
-                field("I/C ACH"; Rec."I/C ACH")
                 {
                 }
             }

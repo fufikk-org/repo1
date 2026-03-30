@@ -7,16 +7,6 @@ pageextension 70260 "COL Item Journal" extends "Item Journal"
 {
     layout
     {
-        addlast(factboxes)
-        {
-            part(COLSKUReplenishmentFB; "COL SKU Replenishment FactBox")
-            {
-                ApplicationArea = Planning;
-                SubPageLink = "Item No." = field("No."), "Variant Code" = field("Variant Code"), "Location Code" = field("Location Code");
-                Visible = false;
-            }
-        }
-
         addafter(Quantity)
         {
             field("COL Kardex Quantity"; Rec."COL Kardex Quantity")
@@ -48,7 +38,15 @@ pageextension 70260 "COL Item Journal" extends "Item Journal"
                 Editable = false;
             }
         }
-
+        addlast(factboxes)
+        {
+            part(COLSKUReplenishmentFB; "COL SKU Replenishment FactBox")
+            {
+                ApplicationArea = Planning;
+                SubPageLink = "Item No." = field("No."), "Variant Code" = field("Variant Code"), "Location Code" = field("Location Code");
+                Visible = false;
+            }
+        }
     }
 
     actions

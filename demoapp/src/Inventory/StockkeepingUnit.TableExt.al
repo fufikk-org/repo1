@@ -1,14 +1,12 @@
 namespace Weibel.Inventory.Location;
-
+using Microsoft.Purchases.Setup;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Item;
-using Microsoft.Purchases.Setup;
 using Weibel.Inventory.Item;
 using Weibel.Inventory.Setup;
 using Microsoft.Inventory.Setup;
 using Weibel.Inventory.Planning;
 using Microsoft.Inventory.Requisition;
-using Microsoft.Inventory.Item.Catalog;
 using Microsoft.Warehouse.Structure;
 
 tableextension 70159 "COL Stockkeeping Unit" extends "Stockkeeping Unit"
@@ -128,14 +126,6 @@ tableextension 70159 "COL Stockkeeping Unit" extends "Stockkeeping Unit"
             CalcFormula = lookup("Item Variant"."COL Date Changed" where("Item No." = field("Item No."), Code = field("Variant Code")));
             Editable = false;
         }
-        field(70119; "COL Item Reference"; Code[50])
-        {
-            Caption = 'Reference No.';
-            ToolTip = 'Specifies the reference number of the item.';
-            FieldClass = FlowField;
-            CalcFormula = lookup("Item Reference"."Reference No." where("Item No." = field("Item No."), "Variant Code" = field("Variant Code"), "Reference Type" = const(Vendor), "Reference Type No." = field("Vendor No.")));
-            Editable = false;
-        }
         field(70120; "COL SKU Prevent Negative Inv."; Enum "COL Default Inventory")
         {
             Caption = 'Prevent Negative Inventory';
@@ -174,11 +164,12 @@ tableextension 70159 "COL Stockkeeping Unit" extends "Stockkeeping Unit"
         }
     }
 
-
     keys
     {
         key(COL_Key1; "Production BOM No.") { }
-        // key(COL_Key2; "COL Low-Level Code") { }
+#if not HIDE_LOWLEVEL_SKU
+        key(COL_Key2; "COL Low-Level Code") { }
+#endif
     }
 
     trigger OnAfterInsert()

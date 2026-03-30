@@ -1,5 +1,5 @@
 namespace Weibel.Sales.History;
-using Weibel.Foundation.SalesResponsibilityGroup;
+
 using Microsoft.Sales.History;
 using Microsoft.Foundation.Address;
 using System.Environment;
@@ -85,15 +85,6 @@ tableextension 70164 "COL Return Receipt Header" extends "Return Receipt Header"
             Caption = 'Customer No.';
             ToolTip = 'Specifies the Customer No.';
             DataClassification = CustomerContent;
-        }
-        field(70151; "COL Sales Resp. Group"; Code[20])
-        {
-            Caption = 'Sales Responsibility Group';
-            DataClassification = CustomerContent;
-            ToolTip = 'Specifies the sales responsibility group for the sales document.';
-            TableRelation = "COL Sales Resp. Group";
-            ValidateTableRelation = false;
-            Editable = false;
         }
     }
 }

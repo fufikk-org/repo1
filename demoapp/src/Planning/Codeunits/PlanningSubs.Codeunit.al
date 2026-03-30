@@ -29,14 +29,6 @@ codeunit 70168 "COL Planning Subs."
         Rec.FilterGroup(2);
         RequisitionLine.CopyFilters(Rec);
         Rec.FilterGroup(0);
-
-        if RequisitionLine.FindSet() then
-            repeat
-                if (RequisitionLine."COL First Opr. Work Center" = '') or (RequisitionLine."COL First Opr. Wrk Center Grp" = '') then begin
-                    RequisitionLine.COL_FillFromRouting();
-                    RequisitionLine.Modify(false);
-                end;
-            until RequisitionLine.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"Planning Worksheet", 'OnOpenPageEvent', '', false, false)]
@@ -66,12 +58,6 @@ codeunit 70168 "COL Planning Subs."
         RequisitionLine.CopyFilters(Rec);
         Rec.FilterGroup(0);
         RequisitionLine.ModifyAll("Accept Action Message", false);
-    end;
-
-    [EventSubscriber(ObjectType::Table, DataBase::"Requisition Line", OnAfterOnInsert, '', false, false)]
-    local procedure OnAfterOnInsert(var RequisitionLine: Record "Requisition Line"; ReqWkshTemplate: Record "Req. Wksh. Template"; RequisitionWkshName: Record "Requisition Wksh. Name")
-    begin
-        RequisitionLine.COL_FillFromRouting();
     end;
 
 }

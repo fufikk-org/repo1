@@ -3,7 +3,6 @@ page 70236 "COL SKU Planning FactBox"
     Caption = 'SKU Details - Planning';
     PageType = CardPart;
     SourceTable = "Stockkeeping Unit";
-
     layout
     {
         area(content)
@@ -13,7 +12,6 @@ page 70236 "COL SKU Planning FactBox"
                 ApplicationArea = Planning;
                 Caption = 'SKU No.';
                 ToolTip = 'Specifies the number of the item.';
-
                 trigger OnDrillDown()
                 begin
                     ShowDetails();
@@ -36,7 +34,6 @@ page 70236 "COL SKU Planning FactBox"
                 ToolTip = 'Specifies the quantity of an item in planning worksheet lines.';
                 DecimalPlaces = 0 : 5;
                 Editable = false;
-
                 trigger OnDrillDown()
                 begin
                     Rec.COLDrillDownQtyInPlanningWorksheet();
@@ -109,7 +106,6 @@ page 70236 "COL SKU Planning FactBox"
             }
         }
     }
-
     local procedure ShowDetails()
     begin
         Page.Run(Page::"Stockkeeping Unit Card", Rec);

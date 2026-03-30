@@ -7,7 +7,7 @@ using Microsoft.Manufacturing.Routing;
 page 70245 "COL BOM Structure"
 {
     ApplicationArea = All;
-    Caption = 'BOM Structure';
+    Caption = 'BOM Structure DEV';
     PageType = Worksheet;
     SourceTable = "COL BOM Structure";
     UsageCategory = None;
@@ -128,6 +128,10 @@ page 70245 "COL BOM Structure"
                 field("Qty. per Parent"; Rec."Qty. per Parent")
                 {
                 }
+                field("COL Product Life Cycle"; Rec."COL Product Life Cycle")
+                {
+                    HideValue = Rec.Type <> Rec.Type::Item;
+                }
                 field("Replenishment System"; Rec."Replenishment System")
                 {
                 }
@@ -136,10 +140,6 @@ page 70245 "COL BOM Structure"
                 }
                 field("Item Tracking Code"; Rec."Item Tracking Code")
                 {
-                }
-                field("COL Product Life Cycle"; Rec."COL Product Life Cycle")
-                {
-                    HideValue = Rec.Type <> Rec.Type::Item;
                 }
                 field("COL EU RoHS Dir. Compliant"; Rec."COL EU RoHS Dir. Compliant")
                 {

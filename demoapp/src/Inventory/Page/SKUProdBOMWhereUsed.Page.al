@@ -54,22 +54,18 @@ page 70221 "COL SKU Prod. BOM Where-Used"
                 field(Type; Rec."COL Type")
                 {
                     ApplicationArea = Manufacturing;
+                    ToolTip = 'Specifies the type of the where-used line.';
                 }
                 field("No."; Rec."COL No.")
                 {
-                    ToolTip = 'Opens related SKU Card';
                     ApplicationArea = Manufacturing;
-                    trigger OnDrillDown()
-                    begin
-                        this.DrillDownCardPage();
-                    end;
+                    ToolTip = 'Specifies the number of the item or SKU.';
                 }
                 field("Item No."; Rec."Item No.")
                 {
                     Visible = false;
-                    ToolTip = 'Specifies the item number of the item or production BOM component that is assigned to the item.';
                     ApplicationArea = Manufacturing;
-
+                    ToolTip = 'Specifies the item number.';
                 }
                 field("Version Code"; Rec."Version Code")
                 {
@@ -85,11 +81,6 @@ page 70221 "COL SKU Prod. BOM Where-Used"
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the quantity of the item or the production BOM component that is needed for the assigned item.';
-                }
-                field("COL Product Life Cycle"; Rec."COL Product Life Cycle")
-                {
-                    ApplicationArea = Manufacturing;
-                    ToolTip = 'Specifies the product life cycle from the item variant.';
                 }
             }
         }
@@ -185,35 +176,6 @@ page 70221 "COL SKU Prod. BOM Where-Used"
     local procedure DescriptionOnFormat()
     begin
         DescriptionIndent := Rec."Level Code" - 1;
-        if DescriptionIndent <= 0 then
-            DescriptionIndent := 1;
-    end;
-
-    local procedure DrillDownCardPage()
-    var
-        ProductionBOMHeader: Record "Production BOM Header";
-        StockKeepingUnit: Record "Stockkeeping Unit";
-        SKUCard: Page "Stockkeeping Unit Card";
-        ProductionBOM: Page "Production BOM";
-    begin
-        case Rec."COL Type" of
-            Rec."COL Type"::Item:
-                begin
-                    StockKeepingUnit.Get(Rec."COL Related SKU Location Code", Rec."COL Related SKU Item No.", Rec."COL Related SKU Variant Code");
-                    StockKeepingUnit.SetRecFilter();
-                    SkuCard.SetTableView(StockKeepingUnit);
-                    SKUCard.LookupMode(true);
-                    SKUCard.RunModal();
-                end;
-            Rec."COL Type"::"Production BOM":
-                begin
-                    ProductionBOMHeader.Get(Rec."COL No.");
-                    ProductionBOMHeader.SetRecFilter();
-                    ProductionBOM.SetTableView(ProductionBOMHeader);
-                    ProductionBOM.LookupMode(true);
-                    ProductionBOM.RunModal();
-                end;
-        end;
     end;
 }
 

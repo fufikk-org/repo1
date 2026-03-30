@@ -3,7 +3,6 @@ namespace Weibel.Inventory.Journal;
 using Microsoft.Inventory.Journal;
 using Weibel.Inventory.Item;
 using Weibel.Kardex;
-using Microsoft.Manufacturing.Document;
 
 tableextension 70142 "COL Item Journal Line" extends "Item Journal Line"
 {
@@ -38,22 +37,6 @@ tableextension 70142 "COL Item Journal Line" extends "Item Journal Line"
             Caption = 'Kardex Quantity To Confirm';
             DataClassification = CustomerContent;
             ToolTip = 'Specifies Kardex Quantity';
-        }
-        field(70105; "COL Qty. Picked"; Decimal)
-        {
-            Caption = 'Qty. Picked';
-            ToolTip = 'Specifies Quantity Picked on Production Order Component.';
-            FieldClass = FlowField;
-            DecimalPlaces = 0 : 5;
-            CalcFormula = Sum("Prod. Order Component"."Qty. Picked" where("Status" = const(Released), "Prod. Order No." = field("Order No."), "Prod. Order Line No." = field("Order Line No."), "Line No." = field("Prod. Order Comp. Line No.")));
-        }
-        field(70106; "COL Remaining Quantity"; Decimal)
-        {
-            Caption = 'Remaining Quantity';
-            ToolTip = 'Specifies Remaining Quantity on Production Order Component.';
-            FieldClass = FlowField;
-            DecimalPlaces = 0 : 5;
-            CalcFormula = Sum("Prod. Order Component"."Remaining Quantity" where("Status" = const(Released), "Prod. Order No." = field("Order No."), "Prod. Order Line No." = field("Order Line No."), "Line No." = field("Prod. Order Comp. Line No.")));
         }
 
         modify(Quantity)

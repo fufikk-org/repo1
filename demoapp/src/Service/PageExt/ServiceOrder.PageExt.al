@@ -236,10 +236,6 @@ pageextension 70128 "COL Service Order" extends "Service Order"
                 {
                     ApplicationArea = Basic, Suite;
                 }
-                field("COL GS. Salesperson Code"; Rec."COL GS. Salesperson Code")
-                {
-                    ApplicationArea = Basic, Suite;
-                }
                 field("COL GS_0"; Rec."COL GS. Name")
                 {
                     ApplicationArea = Basic, Suite;

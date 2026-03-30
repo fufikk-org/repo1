@@ -64,7 +64,7 @@ codeunit 70172 "COL Create Pick Events"
     var
         CreatePickWhseRelPO: Codeunit "COL Create Pick Whse. Rel. PO";
     begin
-        CreatePickWhseRelPO.DeleteExcludedPics(CreatePickZoneCode, TempWarehouseActivLine, true);  // both must work as from pick worksheet
+        CreatePickWhseRelPO.DeleteExcludedPics(CreatePickZoneCode, TempWarehouseActivLine, true); // both must work as from pick worksheet
     end;
 
 }

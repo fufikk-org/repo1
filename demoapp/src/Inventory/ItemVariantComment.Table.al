@@ -1,12 +1,9 @@
 namespace Weibel.Inventory.Item;
-
 using Microsoft.Inventory.Item;
-
 table 70147 "COL Item Variant Comment"
 {
     DataClassification = CustomerContent;
     Caption = 'Item Variant Comment';
-
     fields
     {
         field(1; "Item No."; Code[20])
@@ -56,7 +53,6 @@ table 70147 "COL Item Variant Comment"
             ToolTip = 'Specifies the new value of the blocking field.';
         }
     }
-
     keys
     {
         key(PK; "Item No.", "Variant Code", "Line No.")

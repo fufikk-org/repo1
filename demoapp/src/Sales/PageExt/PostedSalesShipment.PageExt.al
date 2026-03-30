@@ -72,16 +72,6 @@ pageextension 70125 "COL Posted Sales Shipment" extends "Posted Sales Shipment"
                     ApplicationArea = All;
                 }
             }
-            group("COL Weibel")
-            {
-                Caption = 'Weibel';
-                Visible = false;
-                field("COL Sales Resp. Group"; Rec."COL Sales Resp. Group")
-                {
-                    ApplicationArea = All;
-                    Editable = false;
-                }
-            }
         }
 
         addafter("External Document No.")

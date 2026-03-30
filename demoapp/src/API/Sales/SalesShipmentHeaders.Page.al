@@ -430,9 +430,6 @@ page 70177 "COL Sales Shipment Headers"
                 field(colGSCustomerNo; Rec."COL GS. Customer No.")
                 {
                 }
-                field(colGSSalespersonCode; Rec."COL GS. Salesperson Code")
-                {
-                }
                 field(colOriginalPromisedDate; Rec."COL Original Promised Date")
                 {
                 }

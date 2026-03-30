@@ -11,13 +11,6 @@ pageextension 70228 "COL JobManRegPickJob" extends JobManRegPickJob
                 Editable = false;
                 ApplicationArea = All;
             }
-            field("COL ColIsBlocked"; Rec.COLIsBlocked())
-            {
-                Editable = false;
-                ApplicationArea = All;
-                Caption = 'Is Blocked';
-                ToolTip = 'Indicates whether the job is blocked.';
-            }
         }
     }
 }

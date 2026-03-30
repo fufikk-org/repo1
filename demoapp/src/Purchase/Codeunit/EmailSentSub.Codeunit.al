@@ -2,7 +2,6 @@ namespace weibel.System.Email;
 
 using System.Email;
 using Microsoft.Foundation.Reporting;
-using Microsoft.Purchases.Vendor;
 using System.Utilities;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Setup;
@@ -60,21 +59,6 @@ codeunit 70149 "COL Email Sent Sub."
 
         PurchReminderMgt.GetPDfFromLasernet(RecordVariant, TempBlob);
         IsHandled := true;
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"Report Selections", OnBeforeGetVendorEmailAddress, '', false, false)]
-    local procedure OnBeforeGetVendorEmailAddress(BuyFromVendorNo: Code[20]; var ToAddress: Text; ReportUsage: Option; var IsHandled: Boolean; RecVar: Variant)
-    var
-        Vendor: Record Vendor;
-    begin
-        if ReportUsage <> Enum::"Report Selection Usage"::"COL Order - Reminder".AsInteger() then
-            exit;
-        Vendor.SetLoadFields("FPL Lasernet E-Mail");
-        if Vendor.Get(BuyFromVendorNo) then
-            if Vendor."FPL Lasernet E-Mail" <> '' then begin
-                IsHandled := true;
-                ToAddress := Vendor."FPL Lasernet E-Mail";
-            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Document-Mailing", OnAfterGetEmailSubject, '', false, false)]

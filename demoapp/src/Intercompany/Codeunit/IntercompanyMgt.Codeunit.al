@@ -39,7 +39,6 @@ codeunit 70140 "COL Intercompany Mgt."
         IntercompanyTransactions."Destination Company" := Rec."COL GS. Company";
         IntercompanyTransactions."Destination Customer No." := Rec."COL GS. Customer No.";
         IntercompanyTransactions."Destination Customer Name" := Rec."COL GS. Name";
-        IntercompanyTransactions."Destination Salesperson Code" := Rec."COL GS. Salesperson Code";
         IntercompanyTransactions."Sales GL Account No." := SalesSetup."COL Default Sales GL Account";
         IntercompanyTransactions."Purchase GL Account No." := SalesSetup."COL Default Purch. GL Account";
         IntercompanyTransactions."IC GL Account No." := SalesSetup."COL Default IC GL Account";
@@ -111,7 +110,6 @@ codeunit 70140 "COL Intercompany Mgt."
         IntercompanyTransactions."Destination Company" := Rec."COL GS. Company";
         IntercompanyTransactions."Destination Customer No." := Rec."COL GS. Customer No.";
         IntercompanyTransactions."Destination Customer Name" := Rec."COL GS. Name";
-        IntercompanyTransactions."Destination Salesperson Code" := Rec."COL GS. Salesperson Code";
         IntercompanyTransactions."Sales GL Account No." := ServiceMgtSetup."COL Default Service GL Account";
         IntercompanyTransactions."Purchase GL Account No." := ServiceMgtSetup."COL Default Purch. GL Account";
         IntercompanyTransactions."IC GL Account No." := ServiceMgtSetup."COL Default IC GL Account";

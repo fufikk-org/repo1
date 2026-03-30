@@ -56,26 +56,19 @@ pageextension 70138 "COL Sales Quote" extends "Sales Quote"
                     ApplicationArea = All;
                 }
             }
-            group("COL Weibel")
-            {
-                Caption = 'Weibel';
-                field("COL Sales Order Category"; Rec."COL Sales Order Category")
-                {
-                    ApplicationArea = All;
-                }
-                field("COL Sales Finance Category"; Rec."COL Sales Finance Category")
-                {
-                    ApplicationArea = All;
-                }
-                field("COL Project Name"; Rec."COL Project Name")
-                {
-                    ApplicationArea = All;
-                }
+        }
 
-                field("COL Sales Resp. Group"; Rec."COL Sales Resp. Group")
-                {
-                    ApplicationArea = All;
-                }
+
+
+        addafter("Salesperson Code")
+        {
+            field("COL Sales Finance Category"; Rec."COL Sales Finance Category")
+            {
+                ApplicationArea = All;
+            }
+            field("COL Sales Order Category"; Rec."COL Sales Order Category")
+            {
+                ApplicationArea = All;
             }
         }
 
@@ -205,10 +198,6 @@ pageextension 70138 "COL Sales Quote" extends "Sales Quote"
                     LookupPageId = "COL Intercompany Companies";
                 }
                 field("COL GS. Customer No."; Rec."COL GS. Customer No.")
-                {
-                    ApplicationArea = Basic, Suite;
-                }
-                field("COL GS. Salesperson Code"; Rec."COL GS. Salesperson Code")
                 {
                     ApplicationArea = Basic, Suite;
                 }

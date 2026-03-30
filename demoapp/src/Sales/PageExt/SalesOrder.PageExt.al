@@ -2,9 +2,9 @@ namespace Weibel.Sales.Document;
 
 using Microsoft.Sales.Document;
 using Weibel.Foundation.Reporting;
-using Weibel.Intercompany;
 using Weibel.Packaging;
 using Weibel.Common;
+using Weibel.Intercompany;
 
 pageextension 70124 "COL Sales Order" extends "Sales Order"
 {
@@ -65,39 +65,6 @@ pageextension 70124 "COL Sales Order" extends "Sales Order"
                         }
                     }
                 }
-                group("COL Weibel")
-                {
-                    Caption = 'Weibel';
-                    field("COL Description"; Rec."COL Description")
-                    {
-                        ApplicationArea = All;
-                    }
-                    field("COL Order Information"; Rec."COL Order Information")
-                    {
-                        ApplicationArea = All;
-                    }
-                    field("COL Order Category (Old)"; Rec."COL Order Category (Old)")
-                    {
-                        ApplicationArea = All;
-                    }
-                    field("COL Sales Order Category"; Rec."COL Sales Order Category")
-                    {
-                        ApplicationArea = All;
-                    }
-                    field("COL Sales Finance Category"; Rec."COL Sales Finance Category")
-                    {
-                        ApplicationArea = All;
-                    }
-                    field("COL Project Name"; Rec."COL Project Name")
-                    {
-                        ApplicationArea = All;
-                    }
-
-                    field("COL Sales Resp. Group"; Rec."COL Sales Resp. Group")
-                    {
-                        ApplicationArea = All;
-                    }
-                }
             }
             group("COL Classification")
             {
@@ -133,6 +100,18 @@ pageextension 70124 "COL Sales Order" extends "Sales Order"
                 begin
                     UpdateEditable();
                 end;
+            }
+        }
+
+        addafter("Salesperson Code")
+        {
+            field("COL Sales Finance Category"; Rec."COL Sales Finance Category")
+            {
+                ApplicationArea = All;
+            }
+            field("COL Sales Order Category"; Rec."COL Sales Order Category")
+            {
+                ApplicationArea = All;
             }
         }
 
@@ -273,10 +252,6 @@ pageextension 70124 "COL Sales Order" extends "Sales Order"
                 {
                     ApplicationArea = Basic, Suite;
                 }
-                field("COL GS. Salesperson Code"; Rec."COL GS. Salesperson Code")
-                {
-                    ApplicationArea = Basic, Suite;
-                }
                 field("COL GS_0"; Rec."COL GS. Name")
                 {
                     ApplicationArea = Basic, Suite;
@@ -313,7 +288,30 @@ pageextension 70124 "COL Sales Order" extends "Sales Order"
         }
         addafter(Control1900201301) // prepayments
         {
-
+            group("COL Weibel")
+            {
+                Caption = 'Weibel';
+                field("COL Description"; Rec."COL Description")
+                {
+                    ApplicationArea = All;
+                }
+                field("COL Order Information"; Rec."COL Order Information")
+                {
+                    ApplicationArea = All;
+                }
+                field("COL Project Name"; Rec."COL Project Name")
+                {
+                    ApplicationArea = All;
+                }
+                field("COL Responsibility Group"; Rec."COL Responsibility Group")
+                {
+                    ApplicationArea = All;
+                }
+                field("COL Order Category (Old)"; Rec."COL Order Category (Old)")
+                {
+                    ApplicationArea = All;
+                }
+            }
         }
     }
 

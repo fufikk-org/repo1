@@ -111,6 +111,4 @@ pageextension 70100 "COL Purchase Lines" extends "Purchase Lines"
             end;
         end;
     end;
-
-
 }

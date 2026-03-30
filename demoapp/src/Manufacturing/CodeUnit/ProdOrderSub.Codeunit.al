@@ -9,6 +9,7 @@ using Microsoft.Inventory.Requisition;
 
 codeunit 70228 "COL Prod. Order Sub."
 {
+
     [EventSubscriber(ObjectType::Page, Page::"Released Production Order", 'OnDeleteRecordEvent', '', false, false)]
     local procedure OnDeleteRecordEvent_RelPO(var Rec: Record "Production Order")
     var

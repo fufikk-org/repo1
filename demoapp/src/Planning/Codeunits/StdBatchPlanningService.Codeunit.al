@@ -24,14 +24,12 @@ codeunit 70160 "COL Std Batch Planning Service"
         SelectProdLines(); //COMMIT
         CarryOutProdActionMsg(false); //COMMIT
         FillWorkInfo();
-        FillWorkInfo();
     end;
 
     var
         ManufacturingSetup: Record "Manufacturing Setup";
         DebugMode: Boolean;
         ItemSelected: Code[20];
-
 
     local procedure FillWorkInfo()
     var

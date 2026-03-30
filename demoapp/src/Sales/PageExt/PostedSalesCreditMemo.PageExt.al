@@ -12,27 +12,10 @@ pageextension 70131 "COL Posted Sales Credit Memo" extends "Posted Sales Credit 
             {
                 ApplicationArea = All;
             }
-            field("COL Order No."; Rec."COL Order No.")
-            {
-                ApplicationArea = All;
-            }
             group("COL Weibel")
             {
                 Caption = 'Weibel';
-                field("COL Sales Order Category"; Rec."COL Sales Order Category")
-                {
-                    ApplicationArea = All;
-                }
-                field("COL Sales Finance Category"; Rec."COL Sales Finance Category")
-                {
-                    ApplicationArea = All;
-                }
                 field("COL Project Name"; Rec."COL Project Name")
-                {
-                    ApplicationArea = All;
-                }
-
-                field("COL Sales Resp. Group"; Rec."COL Sales Resp. Group")
                 {
                     ApplicationArea = All;
                 }
@@ -199,6 +182,19 @@ pageextension 70131 "COL Posted Sales Credit Memo" extends "Posted Sales Credit 
                 {
                     ApplicationArea = Basic, Suite;
                 }
+            }
+        }
+
+        addafter("Salesperson Code")
+        {
+            field("COL Sales Finance Category"; Rec."COL Sales Finance Category")
+            {
+                ApplicationArea = All;
+            }
+            field("COL Sales Order Category"; Rec."COL Sales Order Category")
+            {
+                ApplicationArea = All;
+                Editable = false;
             }
         }
     }

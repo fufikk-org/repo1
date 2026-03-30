@@ -209,7 +209,6 @@ codeunit 70188 "COL Create Pick Whse. Rel. PO"
             repeat
                 TempWarehouseActivLine.TransferFields(TempWarehouseActivLine2);
                 TempWarehouseActivLine.Insert();
-
             until TempWarehouseActivLine2.Next() = 0;
 
         if ShowError then
@@ -220,10 +219,4 @@ codeunit 70188 "COL Create Pick Whse. Rel. PO"
                 end;
 
     end;
-
-    // [EventSubscriber(ObjectType::Codeunit, Codeunit::"Create Pick", OnCalcAvailableQtyOnAfterCalcAvailableQtyBase, '', false, false)]
-    // local procedure OnCalcAvailableQtyOnAfterCalcAvailableQtyBase(Item: Record Item; Location: Record Location; VariantCode: Code[10]; SourceType: Integer; SourceSubType: Option; SourceNo: Code[20]; SourceLineNo: Integer; SourceSubLineNo: Integer; var AvailableQtyBase: Decimal)
-    // begin
-    //     AvailableQtyBase := 100;
-    // end;
 }

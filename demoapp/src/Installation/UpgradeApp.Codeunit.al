@@ -28,10 +28,10 @@ codeunit 70125 "COL Upgrade App"
         UpdateSalesOrderInformationField();
         UpdateSalesOrderResponsibilityGroupField();
         UpdateSalesOrderOrderCategoryOldField();
-        UpdateSalesSetupForCustomerSearch();
-        UpdatePurchaseSetupForVendorSearch();
         AddOrderCategoriesOldForSalesOrders();
+        UpdatePurchaseSetupForVendorSearch();
         ClearOrphanedWarnings();
+        UpdateSalesSetupForCustomerSearch();
         UpdateProdOrdersTrackInfo();
         UpdateCreatedByOnItem();
         UpdateCreatedByOnSKU();
@@ -104,14 +104,13 @@ codeunit 70125 "COL Upgrade App"
     begin
         if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetClearOrphanedWarningsUpgradeTag()) then
             exit;
-
         if UntrackedPlanningElement.FindSet() then
             repeat
                 if not RequisitionLine.Get(UntrackedPlanningElement."Worksheet Template Name", UntrackedPlanningElement."Worksheet Batch Name", UntrackedPlanningElement."Worksheet Line No.") then
                     UntrackedPlanningElement.Delete();
             until UntrackedPlanningElement.Next() = 0;
-
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetClearOrphanedWarningsUpgradeTag());
+        UpdateSalesSetupForCustomerSearch();
     end;
 
     local procedure UpdateLeadTimeOnJobPlanningLines()
@@ -221,14 +220,14 @@ codeunit 70125 "COL Upgrade App"
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetUpdateSalesOrderOrderCategoryOldFieldUpgradeTag());
     end;
 
-    local procedure UpdateSalesSetupForCustomerSearch()
+    local procedure AddOrderCategoriesOldForSalesOrders()
     begin
-        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetUpdateSalesSetupForCustomerSearchUpgradeTag()) then
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetAddOrderCategoriesOldForSalesOrdersUpgradeTag()) then
             exit;
 
-        InstallApp.UpdateSalesSetupForCustomerSearch();
+        InstallApp.AddOrderCategoriesOldForSalesOrders();
 
-        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetUpdateSalesSetupForCustomerSearchUpgradeTag());
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetAddOrderCategoriesOldForSalesOrdersUpgradeTag());
     end;
 
     local procedure UpdatePurchaseSetupForVendorSearch()
@@ -241,14 +240,14 @@ codeunit 70125 "COL Upgrade App"
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetUpdatePurchaseSetupForVendorSearchUpgradeTag());
     end;
 
-    local procedure AddOrderCategoriesOldForSalesOrders()
+    local procedure UpdateSalesSetupForCustomerSearch()
     begin
-        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetAddOrderCategoriesOldForSalesOrdersUpgradeTag()) then
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetUpdateSalesSetupForCustomerSearchUpgradeTag()) then
             exit;
 
-        InstallApp.AddOrderCategoriesOldForSalesOrders();
+        InstallApp.UpdateSalesSetupForCustomerSearch();
 
-        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetAddOrderCategoriesOldForSalesOrdersUpgradeTag());
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetUpdateSalesSetupForCustomerSearchUpgradeTag());
     end;
 
     local procedure UpdateProdOrdersTrackInfo()
@@ -280,5 +279,4 @@ codeunit 70125 "COL Upgrade App"
         UpgradeTag: Codeunit "Upgrade Tag";
         UpgradeTagDefinitions: Codeunit "COL Upgrade Tag Definitions";
         InstallApp: Codeunit "COL Install App";
-
 }

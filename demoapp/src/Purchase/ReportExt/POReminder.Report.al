@@ -103,9 +103,7 @@ report 70113 "COL PO Reminder"
                 trigger OnAfterGetRecord()
                 var
                     Vendor: Record Vendor;
-                    ConnectorSetup: Record "FPL Connector Setup";
                     LanguageMgt: Codeunit Language;
-                    LangCode: Code[10];
                 begin
                     CommentTxt := "Purchase Line"."COL Reminder Comment";
                     ItemNo := "No.";
@@ -117,19 +115,15 @@ report 70113 "COL PO Reminder"
                         ItemNo := "Item Reference No.";
 
                     FormatDocument.SetPurchaseLine("Purchase Line", FormattedQuantity, FormattedDirectUnitCost, FormattedVATPct, FormattedLineAmount);
-                    FormattedQuantity := Format("Purchase Line"."Outstanding Quantity");
 
                     Vendor.Get("Purchase Line"."Buy-from Vendor No.");
                     VendorName := Vendor.Name;
-                    LangCode := Vendor."Language Code";
 
-                    if LangCode = '' then begin
-                        ConnectorSetup.Get();
-                        LangCode := ConnectorSetup."Local Language for Documents";
-                    end;
+                    if CurrReport.Language <> LanguageMgt.GetLanguageIdOrDefault(Vendor."Language Code") then
+                        CurrReport.Language := LanguageMgt.GetLanguageIdOrDefault(Vendor."Language Code");
+                    if CurrReport.FormatRegion <> LanguageMgt.GetFormatRegionOrDefault(Vendor."Format Region") then
+                        CurrReport.FormatRegion := LanguageMgt.GetFormatRegionOrDefault(Vendor."Format Region");
 
-                    if CurrReport.Language <> LanguageMgt.GetLanguageIdOrDefault(LangCode) then
-                        CurrReport.Language := LanguageMgt.GetLanguageIdOrDefault(LangCode);
                 end;
 
 

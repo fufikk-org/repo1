@@ -102,9 +102,9 @@ page 70219 "COL Stockkeeping Unit API"
                 field(colItemCreatedByUser; Rec."COL Item Created By User")
                 {
                 }
-                field(colItemReference; Rec."COL Item Reference")
-                {
-                }
+                //field(colItemReference; Rec."COL Item Reference")
+                //{
+                //}
                 field(colProductLifeCycle; Rec."COL Product Life Cycle")
                 {
                 }

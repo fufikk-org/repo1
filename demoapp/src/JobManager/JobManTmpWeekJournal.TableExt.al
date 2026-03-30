@@ -1,7 +1,6 @@
 namespace Weibel.JobManager;
 
 using Microsoft.Projects.Project.Job;
-using Microsoft.Manufacturing.Document;
 
 tableextension 70154 "COL JobManTmpWeekJournal" extends JobManTmpWeekJournal
 {
@@ -32,30 +31,4 @@ tableextension 70154 "COL JobManTmpWeekJournal" extends JobManTmpWeekJournal
             end;
         }
     }
-
-    procedure COLIsBlocked(): Boolean
-    var
-        Job: Record Job;
-        ProductionOrder: Record "Production Order";
-    begin
-        case Rec.RefType of
-            Rec.RefType::Job:
-                begin
-                    Job.SetLoadFields(Blocked);
-                    if Job.Get(Rec.RefNo) then
-                        exit(Job.Blocked <> Job.Blocked::" ")
-                    else
-                        exit(true);
-                end;
-            Rec.RefType::Production:
-                begin
-                    ProductionOrder.SetLoadFields(Status);
-                    if ProductionOrder.Get(Rec.RefNo) then
-                        exit(ProductionOrder.Status = ProductionOrder.Status::Finished)
-                    else
-                        exit(true);
-                end;
-        end;
-        exit(false);
-    end;
 }

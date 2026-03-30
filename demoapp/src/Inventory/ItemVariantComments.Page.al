@@ -1,7 +1,5 @@
 namespace Weibel.Inventory.Item;
-
 using Microsoft.Inventory.Item;
-
 page 70265 "COL Item Variant Comments"
 {
     ApplicationArea = All;
@@ -10,7 +8,6 @@ page 70265 "COL Item Variant Comments"
     SourceTable = "COL Item Variant Comment";
     UsageCategory = None;
     Editable = false;
-
     layout
     {
         area(Content)
@@ -58,3 +55,4 @@ page 70265 "COL Item Variant Comments"
         }
     }
 }
+

@@ -35,11 +35,6 @@ table 70144 "COL I/C Bank Information"
             Caption = 'I/C IBAN';
             ToolTip = 'International Bank Account Number';
         }
-        field(5; "I/C ACH"; Code[50])
-        {
-            Caption = 'I/C ACH';
-            ToolTip = 'ACH Routing Number for wire transfers';
-        }
     }
     keys
     {

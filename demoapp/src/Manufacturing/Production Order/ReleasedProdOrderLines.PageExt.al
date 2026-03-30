@@ -6,8 +6,6 @@ using Weibel.Inventory.Item;
 using Weibel.Inventory.Ledger;
 using Microsoft.Inventory.Costing;
 
-using Weibel.API;
-
 pageextension 70165 "COL Released Prod. Order Lines" extends "Released Prod. Order Lines"
 {
     layout
@@ -65,23 +63,6 @@ pageextension 70165 "COL Released Prod. Order Lines" extends "Released Prod. Ord
                 begin
                     CableLabel.SetData(Rec);
                     CableLabel.RunModal();
-                end;
-            }
-            action("COL Print Serial No.")
-            {
-                ApplicationArea = All;
-                Caption = 'Print Serial No. Label';
-                Image = Print;
-                ToolTip = 'Print Serial No. Label';
-
-                trigger OnAction()
-                var
-                    ProductionOrder: Record "Production Order";
-                    ReportLabel: Report "COL SN Label";
-                begin
-                    ProductionOrder.Get(Rec.Status, Rec."Prod. Order No.");
-                    ReportLabel.InitFrom(ProductionOrder);
-                    ReportLabel.RunModal();
                 end;
             }
 
@@ -142,5 +123,4 @@ pageextension 70165 "COL Released Prod. Order Lines" extends "Released Prod. Ord
             MfgCostCalculationMgt.CalcActTimeAndQtyBase(
               Rec, '', ActRunTime, ActSetupTime, ActOutputQty, ActScrapQty);
     end;
-
 }

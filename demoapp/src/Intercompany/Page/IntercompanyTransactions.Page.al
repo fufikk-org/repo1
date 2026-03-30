@@ -65,10 +65,6 @@ page 70127 "COL Intercompany Transactions"
                 field("Destination Customer Name"; Rec."Destination Customer Name")
                 {
                 }
-                field("Destination Salesperson Code"; Rec."Destination Salesperson Code")
-                {
-
-                }
                 field("Last Error"; Rec."Last Error")
                 {
                 }
