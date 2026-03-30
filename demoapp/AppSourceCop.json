@@ -1,0 +1,9 @@
+{
+    "mandatoryAffixes": [
+        "COL"
+    ],
+    "supportedCountries": [
+        "US", 
+		"DK"
+    ]
+}

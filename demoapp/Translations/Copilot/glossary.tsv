@@ -1,0 +1,132 @@
+English	Danish	Note
+Completed	Fuldført	Standard translation for status fields
+Entry No.	Løbenr.	Standard translation for entry numbers
+Low Level Code	Lavt niveau kode	MRP terminology - level in BOM hierarchy
+Execution Plan	Eksekveringsplan	Core concept - plan for executing production/planning
+Exec. Plan Detail	Eksekveringsplandetalje	Detail line of execution plan
+Execution Count	Eksekveringstæller	Counter for execution attempts
+Planning Errors	Planlægningsfejl	Error log for planning processes
+Job Queue	Opgavekø	Background job system
+Client Type	Klienttype	Type of client (UI/Background/Web)
+Started At	Starttidspunkt	Timestamp for when process started
+Finished At	Sluttidspunkt	Timestamp for when process finished
+Failed	Mislykkedes	Status indicating failure
+Run	Kør	Action to execute/run a process
+Reset Step	Nulstil trin	Action to reset a step in execution
+Item No.	Varenr.	Item number reference
+Line No.	Linjenr.	Line number in table
+MPS	MPS	Master Production Schedule (keep acronym)
+MRP	MRP	Material Requirements Planning (keep acronym)
+master production schedule (MPS)	hovedproduktionsplan (MPS)	Full term with acronym
+material requirements planning (MRP)	materialebehovsplanlægning (MRP)	Full term with acronym
+Status	Status	Status field (keep as-is)
+Type	Type	Type field (keep as-is)
+Description	Beskrivelse	Description field
+User	Bruger	User reference
+Last Run	Sidste kørsel	Last execution timestamp
+Error Message	Fejlmeddelelse	Error message text
+No.	Nummer	Number field abbreviation
+BOM Structure	Styklistestruktur	Bill of materials hierarchy - complex nested data structure
+Phantom BOM	Fantom Stykliste	Virtual BOM component not physically manufactured
+Low-Level Code	Lavt niveau kode / Laveste-niveau-kode / Lavniveaukode	MRP hierarchy calculation (multiple variant spellings used)
+Kardex	Kardex	Automated vertical storage system brand name (keep as-is)
+Snapshot isolation	Snapshot isolation	Database transaction isolation level (technical term)
+ReadUncommitted	ReadUncommitted isolation	Database isolation level (technical term, keep as-is)
+SKU	Lagervare / Varenummer	Stockkeeping Unit - context-dependent translation
+Where-Used	Indgår-i	BOM reverse lookup - shows parent items using component
+Flushing Method	Trækmetode	Production consumption posting method (Manual/Forward/Backward)
+Routing Link Code	Rutebindingskode	Production routing operation connection
+Action Message	Handlingsmeddelelse	Planning system suggestions for supply orders
+Replenishment System	Genbestillingssystem	How items are restocked (Purchase/Prod. Order/Assembly)
+Planning Flexibility	Planlægningsfleksibilitet	Degree of automatic planning changes allowed
+Scrap Factor	Spildfaktor	Manufacturing waste percentage
+Critical Path	Kritisk vej / Kritisk rute	Routing operations that determine production lead time
+Concurrent Capacities	Samtidige kapaciteter	Parallel production resources working simultaneously
+Send-Ahead Quantity	Afsend-forud antal / Send-ahead-antal	Partial quantity sent to next operation early
+Fixed Scrap Quantity	Fast spildantal	Absolute waste amount (not percentage)
+Prevent Negative Inventory	Forebyg negativt lager	Block postings that would create negative stock
+Lead-Time Offset	Gennemløbstidsforskydning / Gennemløbstid	Production timing adjustment from parent operation
+Planning Level Code	Planlægningsniveaukode	MRP calculation level in product structure
+Safety Lead Time	Sikkerhedstid	Buffer time added to planning calculations
+Reorder Point	Genbestillingspunkt	Inventory trigger level for automatic replenishment
+Safety Stock	Sikkerhedslager	Minimum buffer inventory to prevent stockouts
+Lot Size	Lotstørrelse	Production or purchase batch size
+Dampener Period	Dæmpningsperiode	Planning stability period to avoid frequent changes
+Dampener Quantity	Dæmpningsmængde	Minimum quantity change to trigger action message
+Rescheduling Period	Omplanlægningsperiode	Time period allowing automatic date adjustments
+Time Bucket	Tidsinterval	Planning period granularity (day/week/month)
+Blanket Order	Rammeordre / Rammebestilling	Framework purchase agreement with call-offs
+Outstanding Quantity	Restantal / Udestående antal	Remaining unfulfilled order quantity
+Reserved Quantity	Reserveret antal	Inventory allocated to specific demand
+Pick Quantity	Plukantal	Warehouse picking quantity
+Completely Picked	Fuldt plukket	All components retrieved from warehouse
+Bin Code	Placeringskode	Specific warehouse location identifier
+Zone Code	Zonekode	Warehouse area/section identifier
+Shop Floor Bin	Produktionsplacering	Production area storage location
+From-Production Bin	Fra-produktionsplaceringskode	Source location in production
+To-Production Bin	Til-produktionsplaceringskode	Destination location in production
+Capacity Need	Kapacitetsbehov	Resource time requirement for operations
+Capacity Ovhd. Cost	Kapacitets-IO-omkostning / Indirekte kap.kostpris	Capacity overhead expense allocation
+Overhead Rate	IPO-bidrag / Indirekte omkostningssats	Indirect cost percentage applied
+Setup Time	Opstillingstid	Machine/work center preparation time
+Run Time	Operationstid / Kørselstid	Operation execution time per unit
+Wait Time	Ventetid	Queue time before operation starts
+Move Time	Transporttid	Material handling time between operations
+Routing Status	Rutestatus	State of production routing execution
+Schedule Manually	Planlæg manuelt	Override automatic scheduling calculations
+Recalculate	Genberegn	Trigger recalculation of dates/quantities
+Production Blocked	Produktionssperre / Produktion Spærret	Item cannot be used in production orders
+Planning Blocked	Planlægning Spærret	Item excluded from MPS/MRP calculations
+Purchasing Blocked	Indkøb er blokeret / Køb Spærret	Item cannot be purchased
+Sales Blocked	Salg er blokeret / Salg Spærret	Item cannot be sold
+Service Blocked	Servicen er spærret / Service Spærret	Item cannot be used in service orders
+Explode BOM	Udfold stykliste	Expand BOM to show all component lines
+Substitute Item	Erstatningsvare	Alternative item that can replace original
+Internal Status	Intern status	System-internal workflow state
+Released	Frigivet	Document approved and available for execution
+Firm Planned	Fast planlagt	Confirmed production plan not automatically changed
+Simulated	Simuleret	Test/what-if scenario without real transactions
+Legacy Item	Ældre Vare	Historical item from previous system/version
+Item Tracked	Varesporet	Requires lot or serial number tracking
+End User	Slutbruger	Final customer/recipient (not reseller)
+Export Permit	Eksporttilladelse	Government license for export
+Export Classification	Eksportklassifikation	Export control category (EU/US regulations)
+EU RoHS Status	EU RoHS Status / EU RoHS-status	Hazardous substance compliance status
+REACH Compliance	REACH-overholdelse	EU chemical regulation compliance
+SVHC	SVHC	Substances of Very High Concern (keep acronym)
+ECCN	ECCN	Export Control Classification Number (keep acronym)
+Peak Package Body Temp.	Maksimal Pakke-Kropstemperatur	Maximum component temperature specification
+MSL	MSL / Fugtighedsfølsomhedsniveau	Moisture Sensitivity Level for electronic components
+NATO Stock No.	NATO Lagernr.	NATO standardization agreement number
+Item Configuration Type	Varekonfigurationstype	Classification: Customer/Internal/Non-Configuration
+Product Life Cycle	Produktets Livscyklus / Produktlivscyklus	Product stage: Prototype/Standard/Phased Out
+Phased Out	Udfaset	Product being discontinued
+Standard Product	Standardprodukt	Regular production item
+Prototype	Prototype	Development/test item not for production
+Pro Forma Invoice	Pro Forma Faktura / Proformafaktura	Preliminary invoice for customs/quotation
+Intercompany	Koncernintern	Transactions between group companies
+IC Company	IC Virksomhed / Konc.int. virksomhed	Intercompany entity within group
+IC IBAN	I/C IBAN / Konc.int. IBAN	Intercompany bank account number
+IC SWIFT	I/C SWIFT / Konc.int. SWIFT	Intercompany bank identifier code
+Finance Category	Økonomikategori / Salgsfinansieringskategori	Sales financing classification
+Order Category	Ordrekategori	Order type classification
+Quote Delivery	Tilbudslevering	Delivery terms specified in quotation
+Terms and Conditions	Vilkår og Betingelser / Vilkår og betingelser	Contract terms (case varies)
+Package Dimension	Pakkedimension	Shipping package measurements
+Shipping Status	Forsendelsestatus / Forsendelsesstatus / Leveringsstatus	Shipment state (multiple variants used)
+Gross Shipment Weight	Bruttoforsendelsesvægt	Total weight including packaging
+Ad Hoc	Ad hoc	Unplanned/on-demand (keep lowercase)
+ApiKey	ApiKey	API authentication key (keep as-is)
+OAuth	OAuth	Authentication protocol standard (keep as-is)
+PLC Code Matrix	PLC Kode Matrix	Product Lifecycle Code matrix structure
+Warranty	Garanti / Garantikode	Warranty/guarantee code
+Preferred Manufacturer	Foretrukken Producent	Default manufacturer for item
+Manufacturer Item No.	Producentens varenr. / Producent Varenr.	Manufacturer's part number
+Moisture Sensitivity Level	Fugtighedsfølsomhedsniveau	Electronic component humidity sensitivity
+Item Variant	Varevariant	Item with different characteristics (size/color/etc)
+Variant Code	Variantkode	Code identifying specific variant
+Stockkeeping Unit	Lagervare (pr. lok.)	Item-Variant-Location combination
+Dimension Set	Dimensionsgruppe / Dimensionsæt	Combination of dimension values
+Default Dimension	Standarddimension	Automatically applied dimension value
+Shortcut Dimension	Genvejsdimension	Quick-access dimension on documents
+
