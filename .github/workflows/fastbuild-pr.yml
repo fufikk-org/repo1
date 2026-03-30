@@ -1,0 +1,63 @@
+# ============================================================
+#  FastBuild — GitHub Actions: PR build (compile only, no publish)
+#
+#  Copy this file to your AL workspace repository at:
+#    .github/workflows/build-pr.yml
+#
+#  Before first use:
+#    1. Set the 'fastbuild-repo' env var below to match your
+#       GitHub org/repo name for the FastBuild scripts.
+#    2. If FastBuild is a private repo, create a repository
+#       secret named FASTBUILD_TOKEN (classic PAT with 'repo'
+#       scope) and uncomment the token line in the checkout step.
+# ============================================================
+
+name: Build BC Workspace
+
+on:
+  pull_request:
+    branches:
+      - develop
+  workflow_dispatch:
+
+env:
+  FASTBUILD_REPO: https://github.com/fufikk-org/fastbuild   # ← adjust to your org/repo
+
+jobs:
+  build:
+    name: Compile BC apps
+    runs-on: windows-latest
+
+    steps:
+
+      # ── Checkout the AL workspace (this repo) ──────────────────
+      - name: Checkout AL workspace
+        uses: actions/checkout@v4
+        with:
+          path: workspace
+
+      # ── Checkout FastBuild scripts ──────────────────────────────
+      - name: Checkout FastBuild
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.FASTBUILD_REPO }}
+          path: fastbuild
+          token: ${{ secrets.FASTBUILD_TOKEN }}   # uncomment for private repo
+
+      # ── Build (compile only — symbols downloaded, no publish) ───
+      - name: Build BC workspace
+        shell: pwsh
+        run: |
+          & "${{ github.workspace }}/fastbuild/Build-BCWorkspace.ps1" `
+            -WorkspacePath "${{ github.workspace }}/workspace" `
+            -UpdateTool `
+            -PreRelease
+
+      # ── Upload compiled .app files as workflow artifact ──────────
+      - name: Upload compiled apps
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: BCApps
+          path: ${{ github.workspace }}/workspace/.output/*.app
+          if-no-files-found: warn
