@@ -72,7 +72,50 @@ jobs:
           path: fastbuild
           token: ${{ secrets.FASTBUILD_TOKEN }}   # uncomment for private repo
 
-      # ── Build (compile only — symbols downloaded, no publish) ───
+      # ── Compute .alpackages cache key ───────────────────────────
+      # Queries MSSymbols for the BC platform version and AppSource
+      # for each ISV dependency. Custom/internal packages are excluded
+      # (always downloaded fresh, never cached).
+      - name: Compute symbol cache key
+        id: cache-key
+        shell: pwsh
+        run: |
+          & "${{ github.workspace }}/fastbuild/Get-BCCacheKey.ps1" `
+            -WorkspacePath "${{ github.workspace }}/workspace"
+
+      # ── Restore .alpackages cache (MS + ISV symbols) ────────────
+      - name: Restore symbol cache
+        id: symbol-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: workspace/.alpackages
+          key: ${{ steps.cache-key.outputs.cache-key }}
+
+      # ── Download MS + ISV symbols on cache miss ─────────────────
+      # Skipped entirely when the cache is restored above.
+      # The save step below runs immediately after, before compilation,
+      # so compiled workspace .app files do not pollute the cache.
+      - name: Download symbols
+        if: steps.symbol-cache.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: |
+          & "${{ github.workspace }}/fastbuild/Get-ALSymbols.ps1" `
+            -WorkspacePath "${{ github.workspace }}/workspace" `
+            -Country       "${{ steps.cache-key.outputs.country }}"
+
+      # ── Save symbol cache ────────────────────────────────────────
+      # Saved here (after download, before compilation) so the cache
+      # contains only symbol packages, not compiled workspace apps.
+      - name: Save symbol cache
+        if: steps.symbol-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: workspace/.alpackages
+          key: ${{ steps.cache-key.outputs.cache-key }}
+
+      # ── Build (compile only — symbols already in .alpackages) ───
+      # Get-ALSymbols inside Build-BCWorkspace skips download because
+      # .alpackages already contains files from the cache/download steps.
       - name: Build BC workspace
         shell: pwsh
         run: |
