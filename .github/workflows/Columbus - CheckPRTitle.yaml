@@ -11,7 +11,7 @@ permissions:
 jobs:
   CheckABLink:
     name: Check Azure DevOps AB# link in PR title
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Validate AB# reference in PR title
         id: check
