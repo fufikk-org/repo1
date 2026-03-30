@@ -26,7 +26,7 @@ env:
 jobs:
   build:
     name: Compile BC apps
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
 
     steps:
 
