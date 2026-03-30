@@ -12,7 +12,7 @@
 #       scope) and uncomment the token line in the checkout step.
 # ============================================================
 
-name: Build BC Workspace
+name: Fastbuild BC Apps in the workspace
 
 on:
   pull_request:
@@ -21,7 +21,7 @@ on:
   workflow_dispatch:
 
 env:
-  FASTBUILD_REPO: https://github.com/fufikk-org/fastbuild   # ← adjust to your org/repo
+  FASTBUILD_REPO: fufikk-org/fastbuild   # ← adjust to your org/repo
 
 jobs:
   build:
