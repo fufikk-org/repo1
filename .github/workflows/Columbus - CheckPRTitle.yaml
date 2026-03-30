@@ -13,22 +13,63 @@ jobs:
     name: Check Azure DevOps AB# link in PR title
     runs-on: ubuntu-slim
     steps:
-      - name: Validate AB# reference in PR title
+      - name: Validate AB# references and fetch work items
         id: check
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
+          ADO_PAT: ${{ secrets.AZURE_DEVOPS_PAT }}
+          ADO_ORG: ${{ vars.AZURE_DEVOPS_ORG }}
+          ADO_PROJECT: ${{ vars.AZURE_DEVOPS_PROJECT }}
         run: |
-          if [[ "$PR_TITLE" =~ AB#[0-9]+ ]]; then
-            MATCH=$(echo "$PR_TITLE" | grep -oP 'AB#[0-9]+')
-            echo "✅ Found Azure DevOps work item reference: $MATCH"
-            echo "found=true" >> $GITHUB_OUTPUT
-            echo "match=$MATCH" >> $GITHUB_OUTPUT
-          else
+          IDS=$(echo "$PR_TITLE" | grep -oP 'AB#\K[0-9]+' | tr '\n' ' ')
+
+          if [ -z "$IDS" ]; then
             echo "::warning::PR title does not contain an Azure DevOps work item reference (e.g. AB#1234)."
             echo "found=false" >> $GITHUB_OUTPUT
+            exit 0
           fi
 
-      - name: Post or update warning comment if AB# missing
+          echo "found=true" >> $GITHUB_OUTPUT
+
+          RESULTS="[]"
+          HAS_MISSING=0
+
+          for ID in $IDS; do
+            RESPONSE=$(curl -s -o response.json -w "%{http_code}" \
+              -u ":$ADO_PAT" \
+              "https://dev.azure.com/$ADO_ORG/$ADO_PROJECT/_apis/wit/workitems/$ID?api-version=7.0")
+
+            if [ "$RESPONSE" == "200" ]; then
+              TITLE=$(python3 -c "import json; d=json.load(open('response.json')); print(d['fields']['System.Title'])")
+              TYPE=$(python3 -c "import json; d=json.load(open('response.json')); print(d['fields']['System.WorkItemType'])")
+              STATE=$(python3 -c "import json; d=json.load(open('response.json')); print(d['fields']['System.State'])")
+              echo "✅ AB#$ID — $TITLE ($TYPE, $STATE)"
+              RESULTS=$(echo "$RESULTS" | python3 -c "
+          import sys, json
+          rows = json.load(sys.stdin)
+          rows.append({'id': '$ID', 'title': '$TITLE', 'type': '$TYPE', 'state': '$STATE', 'found': True})
+          print(json.dumps(rows))
+          ")
+            else
+              echo "::error::Work item AB#$ID not found in Azure DevOps (HTTP $RESPONSE)"
+              HAS_MISSING=1
+              RESULTS=$(echo "$RESULTS" | python3 -c "
+          import sys, json
+          rows = json.load(sys.stdin)
+          rows.append({'id': '$ID', 'title': '', 'type': '', 'state': '', 'found': False})
+          print(json.dumps(rows))
+          ")
+            fi
+          done
+
+          RESULTS_B64=$(echo "$RESULTS" | base64 -w 0)
+          echo "results_b64=$RESULTS_B64" >> $GITHUB_OUTPUT
+
+          if [ "$HAS_MISSING" == "1" ]; then
+            exit 1
+          fi
+
+      - name: Post or update comment — AB# missing
         if: steps.check.outputs.found == 'false'
         uses: actions/github-script@v7
         with:
@@ -72,11 +113,42 @@ jobs:
               });
             }
 
-      - name: Update comment to resolved if AB# present
-        if: steps.check.outputs.found == 'true'
+      - name: Post or update comment — work items found
+        if: always() && steps.check.outputs.found == 'true'
         uses: actions/github-script@v7
+        env:
+          RESULTS_B64: ${{ steps.check.outputs.results_b64 }}
+          ADO_ORG: ${{ vars.AZURE_DEVOPS_ORG }}
+          ADO_PROJECT: ${{ vars.AZURE_DEVOPS_PROJECT }}
         with:
           script: |
+            const { RESULTS_B64, ADO_ORG, ADO_PROJECT } = process.env;
+            const results = JSON.parse(Buffer.from(RESULTS_B64, 'base64').toString('utf8'));
+
+            const allFound = results.every(r => r.found);
+            const header = allFound
+              ? '## ✅ Azure DevOps Work Item(s) Linked'
+              : '## ❌ Azure DevOps Work Item(s) — Some Not Found';
+
+            const tableHeader = [
+              '| Work Item | Title | Type | State |',
+              '|---|---|---|---|'
+            ];
+            const tableRows = results.map(r => {
+              if (r.found) {
+                const url = `https://dev.azure.com/${ADO_ORG}/${ADO_PROJECT}/_workitems/edit/${r.id}`;
+                return `| [AB#${r.id}](${url}) | ${r.title} | ${r.type} | ${r.state} |`;
+              } else {
+                return `| AB#${r.id} | ❌ Not found in Azure DevOps | — | — |`;
+              }
+            });
+
+            const footer = allFound
+              ? ['', 'You can mark this conversation as resolved.']
+              : ['', '❌ Please correct the work item IDs that could not be found — this PR is blocked until all references are valid.'];
+
+            const body = [header, '', ...tableHeader, ...tableRows, ...footer, '', '<!-- ab-check -->'].join('\n');
+
             const comments = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -90,6 +162,13 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 comment_id: existing.id,
-                body: '✅ **Azure DevOps work item linked** — found `${{ steps.check.outputs.match }}` in the PR title. You can now mark this conversation as resolved.\n\n<!-- ab-check -->'
+                body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body
               });
             }
