@@ -58,11 +58,45 @@ jobs:
             echo "found=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Set up .NET SDK
+      # Resolve the install path that setup-dotnet will use on this runner.
+      # Captured before the install so restore and save reference the same directory.
+      # Defaults to /usr/share/dotnet (standard ubuntu runner location) when DOTNET_ROOT
+      # is not yet set.
+      - name: Resolve .NET install path
+        id: dotnet-path
         if: steps.check-dotnet.outputs.found == 'false'
+        shell: bash
+        run: echo "dir=${DOTNET_ROOT:-/usr/share/dotnet}" >> "$GITHUB_OUTPUT"
+
+      - name: Restore .NET SDK cache
+        id: dotnet-cache
+        if: steps.check-dotnet.outputs.found == 'false'
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ steps.dotnet-path.outputs.dir }}
+          key: fastbuild-dotnet-8
+
+      - name: Set up .NET SDK
+        if: steps.check-dotnet.outputs.found == 'false' && steps.dotnet-cache.outputs.cache-hit != 'true'
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.x'
+
+      - name: Save .NET SDK cache
+        if: steps.check-dotnet.outputs.found == 'false' && steps.dotnet-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ steps.dotnet-path.outputs.dir }}
+          key: fastbuild-dotnet-8
+
+      # Add dotnet to PATH whether it came from cache or a fresh install.
+      - name: Add .NET to PATH
+        if: steps.check-dotnet.outputs.found == 'false'
+        shell: bash
+        run: |
+          echo "${{ steps.dotnet-path.outputs.dir }}"       >> "$GITHUB_PATH"
+          echo "${{ steps.dotnet-path.outputs.dir }}/tools" >> "$GITHUB_PATH"
+          echo "DOTNET_ROOT=${{ steps.dotnet-path.outputs.dir }}" >> "$GITHUB_ENV"
 
       # ── Checkout FastBuild scripts ──────────────────────────────
       - name: Checkout FastBuild
