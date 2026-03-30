@@ -12,21 +12,31 @@
 #       scope) and uncomment the token line in the checkout step.
 # ============================================================
 
-name: Fastbuild BC Apps in the workspace
+name: Build BC Workspace
 
 on:
   pull_request:
     branches:
       - develop
   workflow_dispatch:
+    inputs:
+      runner:
+        description: 'Runner'
+        required: false
+        default: 'ubuntu-slim'
+        type: choice
+        options:
+          - ubuntu-slim
+          - ubuntu-latest
+          - windows-latest
 
 env:
-  FASTBUILD_REPO: fufikk-org/fastbuild   # ← adjust to your org/repo
+  FASTBUILD_REPO: fufikk-org/fastbuild
 
 jobs:
   build:
     name: Compile BC apps
-    runs-on: ubuntu-slim
+    runs-on: ${{ inputs.runner || 'ubuntu-slim' }}
 
     steps:
 
