@@ -36,6 +36,24 @@ jobs:
         with:
           path: workspace
 
+      # ── Ensure .NET SDK is available (pre-installed on ubuntu-latest; ──
+      # ── missing on ubuntu-slim and other minimal runners)           ──
+      - name: Check for .NET SDK
+        id: check-dotnet
+        shell: bash
+        run: |
+          if command -v dotnet &>/dev/null; then
+            echo "found=true"  >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up .NET SDK
+        if: steps.check-dotnet.outputs.found == 'false'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x'
+
       # ── Checkout FastBuild scripts ──────────────────────────────
       - name: Checkout FastBuild
         uses: actions/checkout@v4
