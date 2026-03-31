@@ -8,6 +8,9 @@
     },
     {
       "path": ".AL-Go"
+    },
+    {
+      "path": ".github"
     }
   ],
   "settings": {}

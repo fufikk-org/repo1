@@ -1,5 +1,22 @@
 {
     "version": "0.2.0",
     "configurations": [
+        {
+            "name": "Publish: KPOSP-Sandbox",
+            "type": "al",
+            "request": "launch",
+            "environmentType": "Sandbox",
+            "environmentName": "KPOSP-Sandbox",
+            "tenant": "1fdf3400-c721-4fc4-84ca-7163d6ba4399",
+            "startupObjectId": 22,
+            "breakOnError": "All",
+            "breakOnRecordWrite": "None",
+            "launchBrowser": true,
+            "enableSqlInformationDebugger": true,
+            "enableLongRunningSqlStatements": true,
+            "longRunningSqlStatementsThreshold": 500,
+            "numberOfSqlStatements": 10,
+            "useMcpServerForDebugging": true
+        }
     ]
 }

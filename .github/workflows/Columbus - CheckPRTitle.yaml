@@ -1,0 +1,284 @@
+name: 'COL - Check PR Title AB# Link'
+
+on:
+  pull_request:
+    branches: [ 'develop' ]
+    types: [ opened, edited, synchronize, reopened ]
+  pull_request_review_comment:
+    types: [ created, edited ]
+  issue_comment:
+    types: [ created, edited ]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  CheckABLink:
+    name: Check Azure DevOps AB# link in PR title and comments
+    runs-on: ubuntu-slim
+    steps:
+      - name: Resolve PR context
+        id: context
+        uses: actions/github-script@v7
+        with:
+          script: |
+            let prNumber, prTitle;
+
+            if (context.eventName === 'issue_comment') {
+              if (!context.payload.issue.pull_request) {
+                console.log('Comment is on a plain issue — skipping.');
+                core.setOutput('skip', 'true');
+                return;
+              }
+              prNumber = context.payload.issue.number;
+              const pr = await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber
+              });
+              prTitle = pr.data.title;
+            } else if (context.eventName === 'pull_request_review_comment') {
+              prNumber = context.payload.pull_request.number;
+              prTitle = context.payload.pull_request.title;
+            } else {
+              prNumber = context.payload.pull_request.number;
+              prTitle = context.payload.pull_request.title;
+            }
+
+            core.setOutput('skip', 'false');
+            core.setOutput('pr_number', String(prNumber));
+            core.setOutput('pr_title', prTitle);
+
+      - name: Validate AB# references and fetch work items
+        if: steps.context.outputs.skip != 'true'
+        id: check
+        env:
+          PR_TITLE: ${{ steps.context.outputs.pr_title }}
+          PR_NUMBER: ${{ steps.context.outputs.pr_number }}
+          ADO_PAT: ${{ secrets.AZURE_DEVOPS_PAT }}
+          ADO_ORG: ${{ vars.AZURE_DEVOPS_ORG }}
+          ADO_PROJECT: ${{ vars.AZURE_DEVOPS_PROJECT }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          declare -A ID_SOURCES
+
+          # --- Collect AB# IDs from PR title ---
+          TITLE_IDS=$(echo "$PR_TITLE" | grep -oP 'AB#\K[0-9]+' || true)
+          for ID in $TITLE_IDS; do
+            ID_SOURCES[$ID]="title"
+          done
+
+          # --- Collect AB# IDs from issue comments (regular PR comments), skip bot comments ---
+          PAGE=1
+          while true; do
+            RESPONSE=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/$REPO/issues/$PR_NUMBER/comments?per_page=100&page=$PAGE")
+            COUNT=$(echo "$RESPONSE" | python3 -c "import sys,json; print(len(json.load(sys.stdin)))")
+            if [ "$COUNT" == "0" ]; then break; fi
+            COMMENT_IDS=$(echo "$RESPONSE" | python3 -c "
+          import sys, json, re
+          comments = json.load(sys.stdin)
+          ids = set()
+          for c in comments:
+            if c.get('user', {}).get('type') == 'Bot' or '<!-- ab-check -->' in (c.get('body', '') or ''):
+              continue
+            ids.update(re.findall(r'AB#(\d+)', c.get('body', '') or ''))
+          print(' '.join(ids))
+          ")
+            for ID in $COMMENT_IDS; do
+              if [ -z "${ID_SOURCES[$ID]+x}" ]; then
+                ID_SOURCES[$ID]="comment"
+              elif [[ "${ID_SOURCES[$ID]}" != *"comment"* ]]; then
+                ID_SOURCES[$ID]="${ID_SOURCES[$ID]}, comment"
+              fi
+            done
+            PAGE=$((PAGE + 1))
+          done
+
+          # --- Collect AB# IDs from review comments, skip bot comments ---
+          PAGE=1
+          while true; do
+            RESPONSE=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/$REPO/pulls/$PR_NUMBER/comments?per_page=100&page=$PAGE")
+            COUNT=$(echo "$RESPONSE" | python3 -c "import sys,json; print(len(json.load(sys.stdin)))")
+            if [ "$COUNT" == "0" ]; then break; fi
+            REVIEW_IDS=$(echo "$RESPONSE" | python3 -c "
+          import sys, json, re
+          comments = json.load(sys.stdin)
+          ids = set()
+          for c in comments:
+            if c.get('user', {}).get('type') == 'Bot' or '<!-- ab-check -->' in (c.get('body', '') or ''):
+              continue
+            ids.update(re.findall(r'AB#(\d+)', c.get('body', '') or ''))
+          print(' '.join(ids))
+          ")
+            for ID in $REVIEW_IDS; do
+              if [ -z "${ID_SOURCES[$ID]+x}" ]; then
+                ID_SOURCES[$ID]="review comment"
+              elif [[ "${ID_SOURCES[$ID]}" != *"review comment"* ]]; then
+                ID_SOURCES[$ID]="${ID_SOURCES[$ID]}, review comment"
+              fi
+            done
+            PAGE=$((PAGE + 1))
+          done
+
+          # --- Check if anything was found at all ---
+          if [ ${#ID_SOURCES[@]} -eq 0 ]; then
+            echo "::warning::No Azure DevOps work item references (AB#) found in PR title or comments."
+            echo "found=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "found=true" >> $GITHUB_OUTPUT
+
+          # --- Validate each unique ID against ADO ---
+          RESULTS="[]"
+          HAS_MISSING=0
+
+          for ID in "${!ID_SOURCES[@]}"; do
+            SOURCE="${ID_SOURCES[$ID]}"
+            RESPONSE=$(curl -s -o response.json -w "%{http_code}" \
+              -u ":$ADO_PAT" \
+              "https://dev.azure.com/$ADO_ORG/$ADO_PROJECT/_apis/wit/workitems/$ID?api-version=7.0")
+
+            if [ "$RESPONSE" == "200" ]; then
+              TITLE_VAL=$(python3 -c "import json; d=json.load(open('response.json')); print(d['fields']['System.Title'])")
+              TYPE_VAL=$(python3 -c "import json; d=json.load(open('response.json')); print(d['fields']['System.WorkItemType'])")
+              STATE_VAL=$(python3 -c "import json; d=json.load(open('response.json')); print(d['fields']['System.State'])")
+              echo "✅ AB#$ID — $TITLE_VAL ($TYPE_VAL, $STATE_VAL) [found in: $SOURCE]"
+              RESULTS=$(echo "$RESULTS" | python3 -c "
+          import sys, json
+          rows = json.load(sys.stdin)
+          rows.append({'id': '$ID', 'title': '$TITLE_VAL', 'type': '$TYPE_VAL', 'state': '$STATE_VAL', 'found': True, 'source': '$SOURCE'})
+          print(json.dumps(rows))
+          ")
+            else
+              echo "::error::Work item AB#$ID not found in Azure DevOps (HTTP $RESPONSE) [found in: $SOURCE]"
+              HAS_MISSING=1
+              RESULTS=$(echo "$RESULTS" | python3 -c "
+          import sys, json
+          rows = json.load(sys.stdin)
+          rows.append({'id': '$ID', 'title': '', 'type': '', 'state': '', 'found': False, 'source': '$SOURCE'})
+          print(json.dumps(rows))
+          ")
+            fi
+          done
+
+          RESULTS_B64=$(echo "$RESULTS" | base64 -w 0)
+          echo "results_b64=$RESULTS_B64" >> $GITHUB_OUTPUT
+
+          if [ "$HAS_MISSING" == "1" ]; then
+            exit 1
+          fi
+
+      - name: Post or update comment — AB# missing
+        if: steps.context.outputs.skip != 'true' && steps.check.outputs.found == 'false'
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ steps.context.outputs.pr_number }}
+        with:
+          script: |
+            const prNumber = parseInt(process.env.PR_NUMBER);
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber
+            });
+            const existing = comments.data.find(
+              c => c.user.type === 'Bot' && c.body.includes('<!-- ab-check -->')
+            );
+            const body = [
+              '## ⚠️ Missing Azure DevOps Work Item Link',
+              '',
+              'No reference to an Azure DevOps work item was found in the PR title or any comment.',
+              '',
+              '**To fix this**, update the PR title (preferred) or add a comment containing `AB#<number>`, e.g.:',
+              '',
+              '> `feat: add customer list page AB#1234`',
+              '',
+              '> `fix: correct VAT calculation AB#42`',
+              '',
+              'Linking to a work item ensures full traceability between code changes and requirements.',
+              '',
+              '<!-- ab-check -->'
+            ].join('\n');
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body
+              });
+            }
+
+      - name: Post or update comment — work items found
+        if: always() && steps.context.outputs.skip != 'true' && steps.check.outputs.found == 'true'
+        uses: actions/github-script@v7
+        env:
+          RESULTS_B64: ${{ steps.check.outputs.results_b64 }}
+          ADO_ORG: ${{ vars.AZURE_DEVOPS_ORG }}
+          ADO_PROJECT: ${{ vars.AZURE_DEVOPS_PROJECT }}
+          PR_NUMBER: ${{ steps.context.outputs.pr_number }}
+        with:
+          script: |
+            const { RESULTS_B64, ADO_ORG, ADO_PROJECT } = process.env;
+            const prNumber = parseInt(process.env.PR_NUMBER);
+            const results = JSON.parse(Buffer.from(RESULTS_B64, 'base64').toString('utf8'));
+
+            const allFound = results.every(r => r.found);
+            const header = allFound
+              ? '## ✅ Azure DevOps Work Item(s) Linked'
+              : '## ❌ Azure DevOps Work Item(s) — Some Not Found';
+
+            const tableHeader = [
+              '| Work Item | Title | Type | State | Found in |',
+              '|---|---|---|---|---|'
+            ];
+            const tableRows = results.map(r => {
+              if (r.found) {
+                const url = `https://dev.azure.com/${ADO_ORG}/${ADO_PROJECT}/_workitems/edit/${r.id}`;
+                return `| [AB#${r.id}](${url}) | ${r.title} | ${r.type} | ${r.state} | ${r.source} |`;
+              } else {
+                return `| AB#${r.id} | ❌ Not found in Azure DevOps | — | — | ${r.source} |`;
+              }
+            });
+
+            const footer = allFound
+              ? ['', 'You can mark this conversation as resolved.']
+              : ['', '❌ Please correct the work item IDs that could not be found — this PR is blocked until all references are valid.'];
+
+            const body = [header, '', ...tableHeader, ...tableRows, ...footer, '', '<!-- ab-check -->'].join('\n');
+
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber
+            });
+            const existing = comments.data.find(
+              c => c.user.type === 'Bot' && c.body.includes('<!-- ab-check -->')
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body
+              });
+            }
