@@ -4,59 +4,128 @@ on:
   pull_request:
     branches: [ 'develop' ]
     types: [ opened, edited, synchronize, reopened ]
+  pull_request_review_comment:
+    types: [ created, edited ]
+  issue_comment:
+    types: [ created, edited ]
 
 permissions:
   pull-requests: write
 
 jobs:
   CheckABLink:
-    name: Check Azure DevOps AB# link in PR title
+    name: Check Azure DevOps AB# link in PR title and comments
     runs-on: ubuntu-slim
     steps:
       - name: Validate AB# references and fetch work items
         id: check
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
           ADO_PAT: ${{ secrets.AZURE_DEVOPS_PAT }}
           ADO_ORG: ${{ vars.AZURE_DEVOPS_ORG }}
           ADO_PROJECT: ${{ vars.AZURE_DEVOPS_PROJECT }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
         run: |
-          IDS=$(echo "$PR_TITLE" | grep -oP 'AB#\K[0-9]+' | tr '\n' ' ')
+          # --- Collect AB# IDs from PR title ---
+          declare -A ID_SOURCES
 
-          if [ -z "$IDS" ]; then
-            echo "::warning::PR title does not contain an Azure DevOps work item reference (e.g. AB#1234)."
+          TITLE_IDS=$(echo "$PR_TITLE" | grep -oP 'AB#\K[0-9]+' || true)
+          for ID in $TITLE_IDS; do
+            ID_SOURCES[$ID]="title"
+          done
+
+          # --- Collect AB# IDs from issue comments (regular PR comments) ---
+          PAGE=1
+          while true; do
+            RESPONSE=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/$REPO/issues/$PR_NUMBER/comments?per_page=100&page=$PAGE")
+            COUNT=$(echo "$RESPONSE" | python3 -c "import sys,json; print(len(json.load(sys.stdin)))")
+            if [ "$COUNT" == "0" ]; then break; fi
+            COMMENT_IDS=$(echo "$RESPONSE" | python3 -c "
+          import sys, json, re
+          comments = json.load(sys.stdin)
+          ids = set()
+          for c in comments:
+            ids.update(re.findall(r'AB#(\d+)', c.get('body', '') or ''))
+          print(' '.join(ids))
+          ")
+            for ID in $COMMENT_IDS; do
+              if [ -z "${ID_SOURCES[$ID]+x}" ]; then
+                ID_SOURCES[$ID]="comment"
+              else
+                # Already found in title — keep title as source, mark both
+                ID_SOURCES[$ID]="title, comment"
+              fi
+            done
+            PAGE=$((PAGE + 1))
+          done
+
+          # --- Collect AB# IDs from review comments ---
+          PAGE=1
+          while true; do
+            RESPONSE=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/$REPO/pulls/$PR_NUMBER/comments?per_page=100&page=$PAGE")
+            COUNT=$(echo "$RESPONSE" | python3 -c "import sys,json; print(len(json.load(sys.stdin)))")
+            if [ "$COUNT" == "0" ]; then break; fi
+            REVIEW_IDS=$(echo "$RESPONSE" | python3 -c "
+          import sys, json, re
+          comments = json.load(sys.stdin)
+          ids = set()
+          for c in comments:
+            ids.update(re.findall(r'AB#(\d+)', c.get('body', '') or ''))
+          print(' '.join(ids))
+          ")
+            for ID in $REVIEW_IDS; do
+              if [ -z "${ID_SOURCES[$ID]+x}" ]; then
+                ID_SOURCES[$ID]="review comment"
+              elif [[ "${ID_SOURCES[$ID]}" != *"review comment"* ]]; then
+                ID_SOURCES[$ID]="${ID_SOURCES[$ID]}, review comment"
+              fi
+            done
+            PAGE=$((PAGE + 1))
+          done
+
+          # --- Check if anything was found at all ---
+          if [ ${#ID_SOURCES[@]} -eq 0 ]; then
+            echo "::warning::No Azure DevOps work item references (AB#) found in PR title or comments."
             echo "found=false" >> $GITHUB_OUTPUT
             exit 0
           fi
 
           echo "found=true" >> $GITHUB_OUTPUT
 
+          # --- Validate each unique ID against ADO ---
           RESULTS="[]"
           HAS_MISSING=0
 
-          for ID in $IDS; do
+          for ID in "${!ID_SOURCES[@]}"; do
+            SOURCE="${ID_SOURCES[$ID]}"
             RESPONSE=$(curl -s -o response.json -w "%{http_code}" \
               -u ":$ADO_PAT" \
               "https://dev.azure.com/$ADO_ORG/$ADO_PROJECT/_apis/wit/workitems/$ID?api-version=7.0")
 
             if [ "$RESPONSE" == "200" ]; then
-              TITLE=$(python3 -c "import json; d=json.load(open('response.json')); print(d['fields']['System.Title'])")
-              TYPE=$(python3 -c "import json; d=json.load(open('response.json')); print(d['fields']['System.WorkItemType'])")
-              STATE=$(python3 -c "import json; d=json.load(open('response.json')); print(d['fields']['System.State'])")
-              echo "✅ AB#$ID — $TITLE ($TYPE, $STATE)"
+              TITLE_VAL=$(python3 -c "import json; d=json.load(open('response.json')); print(d['fields']['System.Title'])")
+              TYPE_VAL=$(python3 -c "import json; d=json.load(open('response.json')); print(d['fields']['System.WorkItemType'])")
+              STATE_VAL=$(python3 -c "import json; d=json.load(open('response.json')); print(d['fields']['System.State'])")
+              echo "✅ AB#$ID — $TITLE_VAL ($TYPE_VAL, $STATE_VAL) [found in: $SOURCE]"
               RESULTS=$(echo "$RESULTS" | python3 -c "
           import sys, json
           rows = json.load(sys.stdin)
-          rows.append({'id': '$ID', 'title': '$TITLE', 'type': '$TYPE', 'state': '$STATE', 'found': True})
+          rows.append({'id': '$ID', 'title': '$TITLE_VAL', 'type': '$TYPE_VAL', 'state': '$STATE_VAL', 'found': True, 'source': '$SOURCE'})
           print(json.dumps(rows))
           ")
             else
-              echo "::error::Work item AB#$ID not found in Azure DevOps (HTTP $RESPONSE)"
+              echo "::error::Work item AB#$ID not found in Azure DevOps (HTTP $RESPONSE) [found in: $SOURCE]"
               HAS_MISSING=1
               RESULTS=$(echo "$RESULTS" | python3 -c "
           import sys, json
           rows = json.load(sys.stdin)
-          rows.append({'id': '$ID', 'title': '', 'type': '', 'state': '', 'found': False})
+          rows.append({'id': '$ID', 'title': '', 'type': '', 'state': '', 'found': False, 'source': '$SOURCE'})
           print(json.dumps(rows))
           ")
             fi
@@ -85,9 +154,9 @@ jobs:
             const body = [
               '## ⚠️ Missing Azure DevOps Work Item Link',
               '',
-              'The PR title does not contain a reference to an Azure DevOps work item.',
+              'No reference to an Azure DevOps work item was found in the PR title or any comment.',
               '',
-              '**To fix this**, update the PR title to include `AB#<number>`, e.g.:',
+              '**To fix this**, update the PR title (preferred) or add a comment containing `AB#<number>`, e.g.:',
               '',
               '> `feat: add customer list page AB#1234`',
               '',
@@ -131,15 +200,15 @@ jobs:
               : '## ❌ Azure DevOps Work Item(s) — Some Not Found';
 
             const tableHeader = [
-              '| Work Item | Title | Type | State |',
-              '|---|---|---|---|'
+              '| Work Item | Title | Type | State | Found in |',
+              '|---|---|---|---|---|'
             ];
             const tableRows = results.map(r => {
               if (r.found) {
                 const url = `https://dev.azure.com/${ADO_ORG}/${ADO_PROJECT}/_workitems/edit/${r.id}`;
-                return `| [AB#${r.id}](${url}) | ${r.title} | ${r.type} | ${r.state} |`;
+                return `| [AB#${r.id}](${url}) | ${r.title} | ${r.type} | ${r.state} | ${r.source} |`;
               } else {
-                return `| AB#${r.id} | ❌ Not found in Azure DevOps | — | — |`;
+                return `| AB#${r.id} | ❌ Not found in Azure DevOps | — | — | ${r.source} |`;
               }
             });
 
