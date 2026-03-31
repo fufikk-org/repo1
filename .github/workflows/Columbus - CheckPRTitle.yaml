@@ -17,26 +17,59 @@ jobs:
     name: Check Azure DevOps AB# link in PR title and comments
     runs-on: ubuntu-slim
     steps:
+      - name: Resolve PR context
+        id: context
+        uses: actions/github-script@v7
+        with:
+          script: |
+            let prNumber, prTitle;
+
+            if (context.eventName === 'issue_comment') {
+              if (!context.payload.issue.pull_request) {
+                console.log('Comment is on a plain issue — skipping.');
+                core.setOutput('skip', 'true');
+                return;
+              }
+              prNumber = context.payload.issue.number;
+              const pr = await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber
+              });
+              prTitle = pr.data.title;
+            } else if (context.eventName === 'pull_request_review_comment') {
+              prNumber = context.payload.pull_request.number;
+              prTitle = context.payload.pull_request.title;
+            } else {
+              prNumber = context.payload.pull_request.number;
+              prTitle = context.payload.pull_request.title;
+            }
+
+            core.setOutput('skip', 'false');
+            core.setOutput('pr_number', String(prNumber));
+            core.setOutput('pr_title', prTitle);
+
       - name: Validate AB# references and fetch work items
+        if: steps.context.outputs.skip != 'true'
         id: check
         env:
-          PR_TITLE: ${{ github.event.pull_request.title }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ steps.context.outputs.pr_title }}
+          PR_NUMBER: ${{ steps.context.outputs.pr_number }}
           ADO_PAT: ${{ secrets.AZURE_DEVOPS_PAT }}
           ADO_ORG: ${{ vars.AZURE_DEVOPS_ORG }}
           ADO_PROJECT: ${{ vars.AZURE_DEVOPS_PROJECT }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
-          # --- Collect AB# IDs from PR title ---
           declare -A ID_SOURCES
 
+          # --- Collect AB# IDs from PR title ---
           TITLE_IDS=$(echo "$PR_TITLE" | grep -oP 'AB#\K[0-9]+' || true)
           for ID in $TITLE_IDS; do
             ID_SOURCES[$ID]="title"
           done
 
-          # --- Collect AB# IDs from issue comments (regular PR comments) ---
+          # --- Collect AB# IDs from issue comments (regular PR comments), skip bot comments ---
           PAGE=1
           while true; do
             RESPONSE=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
@@ -49,21 +82,22 @@ jobs:
           comments = json.load(sys.stdin)
           ids = set()
           for c in comments:
+            if c.get('user', {}).get('type') == 'Bot' or '<!-- ab-check -->' in (c.get('body', '') or ''):
+              continue
             ids.update(re.findall(r'AB#(\d+)', c.get('body', '') or ''))
           print(' '.join(ids))
           ")
             for ID in $COMMENT_IDS; do
               if [ -z "${ID_SOURCES[$ID]+x}" ]; then
                 ID_SOURCES[$ID]="comment"
-              else
-                # Already found in title — keep title as source, mark both
-                ID_SOURCES[$ID]="title, comment"
+              elif [[ "${ID_SOURCES[$ID]}" != *"comment"* ]]; then
+                ID_SOURCES[$ID]="${ID_SOURCES[$ID]}, comment"
               fi
             done
             PAGE=$((PAGE + 1))
           done
 
-          # --- Collect AB# IDs from review comments ---
+          # --- Collect AB# IDs from review comments, skip bot comments ---
           PAGE=1
           while true; do
             RESPONSE=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
@@ -76,6 +110,8 @@ jobs:
           comments = json.load(sys.stdin)
           ids = set()
           for c in comments:
+            if c.get('user', {}).get('type') == 'Bot' or '<!-- ab-check -->' in (c.get('body', '') or ''):
+              continue
             ids.update(re.findall(r'AB#(\d+)', c.get('body', '') or ''))
           print(' '.join(ids))
           ")
@@ -139,14 +175,17 @@ jobs:
           fi
 
       - name: Post or update comment — AB# missing
-        if: steps.check.outputs.found == 'false'
+        if: steps.context.outputs.skip != 'true' && steps.check.outputs.found == 'false'
         uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ steps.context.outputs.pr_number }}
         with:
           script: |
+            const prNumber = parseInt(process.env.PR_NUMBER);
             const comments = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.issue.number
+              issue_number: prNumber
             });
             const existing = comments.data.find(
               c => c.user.type === 'Bot' && c.body.includes('<!-- ab-check -->')
@@ -177,21 +216,23 @@ jobs:
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: context.issue.number,
+                issue_number: prNumber,
                 body
               });
             }
 
       - name: Post or update comment — work items found
-        if: always() && steps.check.outputs.found == 'true'
+        if: always() && steps.context.outputs.skip != 'true' && steps.check.outputs.found == 'true'
         uses: actions/github-script@v7
         env:
           RESULTS_B64: ${{ steps.check.outputs.results_b64 }}
           ADO_ORG: ${{ vars.AZURE_DEVOPS_ORG }}
           ADO_PROJECT: ${{ vars.AZURE_DEVOPS_PROJECT }}
+          PR_NUMBER: ${{ steps.context.outputs.pr_number }}
         with:
           script: |
             const { RESULTS_B64, ADO_ORG, ADO_PROJECT } = process.env;
+            const prNumber = parseInt(process.env.PR_NUMBER);
             const results = JSON.parse(Buffer.from(RESULTS_B64, 'base64').toString('utf8'));
 
             const allFound = results.every(r => r.found);
@@ -221,7 +262,7 @@ jobs:
             const comments = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.issue.number
+              issue_number: prNumber
             });
             const existing = comments.data.find(
               c => c.user.type === 'Bot' && c.body.includes('<!-- ab-check -->')
@@ -237,7 +278,7 @@ jobs:
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: context.issue.number,
+                issue_number: prNumber,
                 body
               });
             }
