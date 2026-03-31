@@ -1,31 +1,56 @@
 {
-  "id": "7f117181-c9a2-4906-a265-baa61ce4a0bc",
-  "name": "app1",
-  "publisher": "KRPO Limited",
-  "version": "1.1.0.0",
-  "brief": "",
-  "description": "",
-  "privacyStatement": "",
-  "EULA": "",
-  "help": "",
-  "url": "",
-  "logo": "",
-  "dependencies": [],
-  "screenshots": [],
-  "platform": "1.0.0.0",
-  "application": "22.0.0.0",
-  "idRanges": [
-    {
-      "from": 56010,
-      "to": 56099
+    "id": "7f117181-c9a2-4906-a265-baa61ce4a0bc",
+    "name": "app1",
+    "publisher": "KRPO Limited",
+    "version": "1.1.0.0",
+    "brief": "",
+    "description": "",
+    "privacyStatement": "",
+    "EULA": "",
+    "help": "",
+    "url": "",
+    "logo": "",
+    "dependencies": [
+        {
+            "id": "7ff6448a-6455-4d50-b731-5a0ecf4f1004",
+            "name": "Advanced Intercompany",
+            "publisher": "IT.integro sp. z o.o.",
+            "version": "1.0.0.0"
+        },
+        {
+            "id": "a1296a3b-3d8d-4bc9-96f1-a164633ac2d0",
+            "name": "Intercompany Insights",
+            "publisher": "IT.integro sp. z o.o.",
+            "version": "1.0.0.0"
+        },
+        {
+            "id": "6da8dd2f-e698-461f-9147-8e404244dd85",
+            "name": "Continia Document Capture",
+            "version": "1.0.0.0",
+            "publisher": "Continia Software"
+        },
+        {
+            "id": "4c27d914-7bc3-46b2-a4e6-006eb115ff85",
+            "name": "Lasernet Connector",
+            "publisher": "Formpipe Software AB",
+            "version": "1.0.0.0"
+        }
+    ],
+    "screenshots": [],
+    "platform": "1.0.0.0",
+    "application": "22.0.0.0",
+    "idRanges": [
+        {
+            "from": 56010,
+            "to": 56099
+        }
+    ],
+    "features": [
+        "NoImplicitWith"
+    ],
+    "resourceExposurePolicy": {
+        "allowDebugging": true,
+        "allowDownloadingSource": false,
+        "includeSourceInSymbolFile": false
     }
-  ],
-  "features": [
-    "NoImplicitWith"
-  ],
-  "resourceExposurePolicy": {
-    "allowDebugging": true,
-    "allowDownloadingSource": false,
-    "includeSourceInSymbolFile": false
-  }
 }
